@@ -20,7 +20,14 @@ class Skill {
         this.row = row;
         this.maxPoints = maxPoints;
     }
+
+    is_legal() {
+        return this.points <= this.maxPoints;
+    }
+    
 };
+
+let tree = new SkillTree([]);
 
 let muscleMemory = new Skill("Muscle Memory", [], 0, 0, 5)
 let strengthTraining = new Skill("Strength Training", [], 0, 0, 5)

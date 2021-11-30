@@ -4,21 +4,40 @@ import { Form, Button, Col, Row } from 'react-bootstrap';
 const sumValues = (obj) => {
     let total = 0;
     for (const x in obj) {
-        total += parseInt(obj[x]);
+        total += obj[x];
     }
     return total;
 }
 
 const SelectSettings = () => {
-    const [value, setValue] = useState({ agility: 0, stealth: 0, survivability: 0, magic: 0, signs: 0 });
-    const MAX_TOTAL = 100;
-    let left = MAX_TOTAL - sumValues(value);
+    const [value, setValue] = useState({ agility: 20, stealth: 20, survivability: 20, magic: 20, signs: 20 });
+    const [pointCount, setPointCount] = useState(0);
     const handleSubmit = async (e) => {
         e.preventDefault();
     };
 
+    const calculateMaxID = (current_id) => {
+        var maxValue;
+        var maxId;
+        for (let v in value) {
+            var val = value[v];
+            var id = v;
+            if (id == current_id) {
+                continue;
+            }
+            if (maxValue === undefined || maxValue < val) {
+                maxValue = val;
+                maxId = id;
+            }
+        }
+        return maxId;
+    }
+
     const calculateSliders = (e, key) => {
-        setValue({ ...value, [key]: e.target.value })
+        let nextMax = calculateMaxID(key);
+        let newValue = parseInt(e.target.value);
+        let difference = value[key] - newValue;
+        setValue({ ...value, [key]: newValue, [nextMax]: value[nextMax] + difference });
     };
 
     return (
@@ -28,7 +47,10 @@ const SelectSettings = () => {
                     Available Points
                 </Form.Label>
                 <Col sm="auto">
-                    <Form.Control type="number" />
+                    <Form.Control type="number" value={pointCount} onChange={e => setPointCount(parseInt(e.target.value))} />
+                </Col>
+                <Col sm="auto">
+                    {pointCount}
                 </Col>
             </Form.Group>
             {Object.keys(value).map((key, index) => {
@@ -41,7 +63,7 @@ const SelectSettings = () => {
                             <Form.Range value={value[key]} onChange={e => calculateSliders(e, key)} min={0} max={100} />
                         </Col>
                         <Col>
-                            {value[key]} / {left}
+                            {value[key]}
                         </Col>
                     </Form.Group>);
             })}

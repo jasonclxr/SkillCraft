@@ -1,21 +1,21 @@
 class SkillTree {
     skills: Array<Skill>;
-    points_remaining: Number;
+    points_remaining: number;
 
-    constructor(skills: Array<Skill>, points_remaining: Number) {
+    constructor(skills: Array<Skill>, points_remaining: number) {
         this.skills = skills;
-        this.points_remaining = this.points_remaining;
+        this.points_remaining = points_remaining;
     }
 };
 
 class Skill {
     name: String;
     tags: Array<String>;
-    points: Number;
+    points: number;
     row: Number;
     maxPoints: Number;
 
-    constructor(name: String, tags: Array<String>, points: Number, row: Number, maxPoints: Number) {
+    constructor(name: String, tags: Array<String>, points: number, row: Number, maxPoints: Number) {
         this.name = name;
         this.tags = tags;
         this.points = points;

@@ -29,41 +29,71 @@ class Skill {
 
 export const tree = new SkillTree([]);
 
-let muscleMemory = new Skill("Muscle Memory", [], 0, 0, 5)
-let strengthTraining = new Skill("Strength Training", [], 0, 0, 5)
-let arrowDeflection = new Skill("Arrow Deflection", [], 0, 0, 3)
-let lightningReflexes = new Skill("Lightning Reflexes", [], 0, 0, 3)
-let resolve = new Skill("Resolve", [], 0, 0, 5)
+let muscleMemory = new Skill("Muscle Memory", [], 0, 0, 5);
+tree.skills.push(muscleMemory);
+let strengthTraining = new Skill("Strength Training", [], 0, 0, 5);
+tree.skills.push(strengthTraining);
+let arrowDeflection = new Skill("Arrow Deflection", [], 0, 0, 3);
+tree.skills.push(arrowDeflection);
+let lightningReflexes = new Skill("Lightning Reflexes", [], 0, 0, 3);
+tree.skills.push(lightningReflexes);
+let resolve = new Skill("Resolve", [], 0, 0, 5);
+tree.skills.push(resolve);
 
-let preciseBlows = new Skill("Precise Blows", [], 0, 1, 5)
-let crushingBlows = new Skill("Crushing Blows", [], 0, 1, 5)
-let fleetFooted = new Skill("Fleet Footed", [], 0, 1, 5)
-let coldBlood = new Skill("Cold Blood", [], 0, 1, 5)
-let undying = new Skill("Undying", [], 0, 1, 5)
+let preciseBlows = new Skill("Precise Blows", [], 0, 1, 5);
+tree.skills.push(preciseBlows);
+let crushingBlows = new Skill("Crushing Blows", [], 0, 1, 5);
+tree.skills.push(crushingBlows);
+let fleetFooted = new Skill("Fleet Footed", [], 0, 1, 5);
+tree.skills.push(fleetFooted);
+let coldBlood = new Skill("Cold Blood", [], 0, 1, 5);
+tree.skills.push(coldBlood);
+let undying = new Skill("Undying", [], 0, 1, 5);
+tree.skills.push(undying);
 
-let whirl = new Skill("Whirl", [], 0, 2, 5)
-let rend = new Skill("Crushing Blows", [], 0, 2, 5)
-let counterAttack = new Skill("Counter Attack", [], 0, 2, 3)
-let anatomicalKnowledge = new Skill("Anatomical Knowledge", [], 0, 2, 5)
-let razorFocus = new Skill("Razor Focus", [], 0, 2, 5)
+let whirl = new Skill("Whirl", [], 0, 2, 5);
+tree.skills.push(whirl);
+let rend = new Skill("Crushing Blows", [], 0, 2, 5);
+tree.skills.push(rend);
+let counterAttack = new Skill("Counter Attack", [], 0, 2, 3);
+tree.skills.push(counterAttack);
+let anatomicalKnowledge = new Skill("Anatomical Knowledge", [], 0, 2, 5);
+tree.skills.push(anatomicalKnowledge);
+let razorFocus = new Skill("Razor Focus", [], 0, 2, 5);
+tree.skills.push(razorFocus);
 
-let cripplingStrikes = new Skill("Crippling Strikes", [], 0, 3, 5)
-let sunderArmor = new Skill("Sunder Armor", [], 0, 3, 5)
-let deadlyPrecision = new Skill("Deadly Precision", [], 0, 3, 2)
-let cripplingShot = new Skill("Crippling Shot", [], 0, 3, 5)
-let floodOfAnger = new Skill("Flood of Anger", [], 0, 3, 5)
+let cripplingStrikes = new Skill("Crippling Strikes", [], 0, 3, 5);
+tree.skills.push(cripplingStrikes);
+let sunderArmor = new Skill("Sunder Armor", [], 0, 3, 5);
+tree.skills.push(sunderArmor);
+let deadlyPrecision = new Skill("Deadly Precision", [], 0, 3, 2);
+tree.skills.push(deadlyPrecision);
+let cripplingShot = new Skill("Crippling Shot", [], 0, 3, 5);
+tree.skills.push(cripplingShot);
+let floodOfAnger = new Skill("Flood of Anger", [], 0, 3, 5);
+tree.skills.push(floodOfAnger);
 
-let farReachingAard = new Skill("Far Reaching Aard", [], 0, 0, 3)
-let meltArmor = new Skill("Strength Training", [], 0, 0, 5)
-let sustainedGlyphs = new Skill("Sustained Glyphs", [], 0, 0, 2)
-let explodingShield = new Skill("Exploding Shield", [], 0, 0, 3)
-let delusion = new Skill("Delusion", [], 0, 0, 3)
+let farReachingAard = new Skill("Far Reaching Aard", [], 0, 0, 3);
+tree.skills.push(farReachingAard);
+let meltArmor = new Skill("Strength Training", [], 0, 0, 5);
+tree.skills.push(meltArmor);
+let sustainedGlyphs = new Skill("Sustained Glyphs", [], 0, 0, 2);
+tree.skills.push(sustainedGlyphs);
+let explodingShield = new Skill("Exploding Shield", [], 0, 0, 3);
+tree.skills.push(explodingShield);
+let delusion = new Skill("Delusion", [], 0, 0, 3);
+tree.skills.push(delusion);
 
-let aardSweep = new Skill("Aard Sweep", [], 0, 1, 3)
-let firestream = new Skill("Firestream", [], 0, 1, 3)
-let magicTrap = new Skill("Magic Trap", [], 0, 1, 3)
-let activeShield = new Skill("Active Shield", [], 0, 1, 3)
-let puppet = new Skill("Puppet", [], 0, 1, 3)
+let aardSweep = new Skill("Aard Sweep", [], 0, 1, 3);
+tree.skills.push(aardSweep);
+let firestream = new Skill("Firestream", [], 0, 1, 3);
+tree.skills.push(firestream);
+let magicTrap = new Skill("Magic Trap", [], 0, 1, 3);
+tree.skills.push(magicTrap);
+let activeShield = new Skill("Active Shield", [], 0, 1, 3);
+tree.skills.push(activeShield);
+let puppet = new Skill("Puppet", [], 0, 1, 3);
+tree.skills.push(puppet);
 
 let aardIntensity = new Skill("Aard Intensity", [], 0, 2, 5)
 tree.skills.push(aardIntensity);

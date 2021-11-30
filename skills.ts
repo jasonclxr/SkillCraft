@@ -1,8 +1,10 @@
 class SkillTree {
     skills: Array<Skill>;
+    points_remaining: Number;
 
-    constructor(skills: Array<Skill>) {
+    constructor(skills: Array<Skill>, points_remaining: Number) {
         this.skills = skills;
+        this.points_remaining = this.points_remaining;
     }
 };
 
@@ -13,7 +15,7 @@ class Skill {
     row: Number;
     maxPoints: Number;
 
-    constructor(name: String, tags: Array<String>, points: number, row: Number, maxPoints: Number) {
+    constructor(name: String, tags: Array<String>, points: Number, row: Number, maxPoints: Number) {
         this.name = name;
         this.tags = tags;
         this.points = points;
@@ -22,12 +24,12 @@ class Skill {
     }
 
     is_legal() {
-        return this.points <= this.maxPoints;
+        return this.points < this.maxPoints;
     }
     
 };
 
-export const tree = new SkillTree([]);
+export const tree = new SkillTree([], 20);
 
 let muscleMemory = new Skill("Muscle Memory", [], 0, 0, 5);
 tree.skills.push(muscleMemory);

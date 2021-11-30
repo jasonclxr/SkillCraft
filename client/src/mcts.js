@@ -16,13 +16,10 @@ class Skill {
 };
 
 class SkillTree {
-    constructor(points_remaining, state) {
+    constructor(points_remaining, state, rows) {
         this.skills = [];
         this.points_remaining = points_remaining;
-        this.combat_row = 0;
-        this.signs_row = 0;
-        this.alchemy_row = 0;
-        this.general_row = 0;
+        this.rows = rows;
         this.state = state;
     }
 };
@@ -41,7 +38,16 @@ class AttributesState {
 class Branch {
     constructor(name, row_costs) {
         this.name = name;
-        this.row_costs = row_costs; 
+        this.row_costs = row_costs;
+        this.points = 0; 
+        this.current_row = 0;
+    }
+
+    addPoint() {
+        this.points += 1;
+        if (this.current_row + 1 < this.row_costs.length && this.points >= this.row_costs[this.current_row + 1]) {
+            this.current_row += 1;
+        }
     }
 }
 
@@ -68,8 +74,9 @@ class MCTS {
         while(this.tree.points_remaining > 0) {
             let skill_index = Math.floor(Math.random() * this.tree.skills.length); //instead of random we should choose a random skill with a bias towards what they want
 
-            if (this.tree.skills[skill_index].is_legal()) { // this should also check if the row is accessible based on the amount of skills in the branch
+            if (this.tree.skills[skill_index].is_legal()) {
                 this.tree.skills[skill_index].points += 1;
+                this.tree.rows[this.tree.skills[skill_index].branch].addPoint();
                 this.tree.points_remaining -= 1;
             }
         }
@@ -88,12 +95,14 @@ class MCTS {
 }
 
 function createTree() {
-    var tree = new SkillTree(20, new AttributesState());
-    
     var combat = new Branch("combat", [0, 8, 20, 30]);
     var signs = new Branch("signs", [0, 6, 18, 28]);
     var alchemy = new Branch("alchemy", [0, 8, 20, 28]);
     var general = new Branch("general", [0]);
+
+    var tree_rows = {"combat": combat, "signs": signs, "alchemy": alchemy, "general": general};
+
+    var tree = new SkillTree(20, new AttributesState(), tree_rows);
 
     let combat_first_row = [];
     let muscleMemory = new Skill("Muscle Memory", [], 0, 5, combat);
@@ -267,7 +276,8 @@ function createTree() {
 }
 
 const tree = createTree();
-console.log(tree);
+const mcts = new MCTS(tree, 100, 2);
+console.log(mcts);
 
 //http://www.rpg-gaming.com/tw3.html
 //https://www.gosunoob.com/witcher-3/skill-calculator/

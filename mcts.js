@@ -22,7 +22,14 @@ function expand_leaf() {
 
 // Selects random skills until points are depleted
 function rollout() {
-
+    while(tree.points_remaining > 0) {
+        let skill_index = Math.floor(Math.random() * tree.skills.length);
+        if (tree.skills[skill_index].is_legal()) {
+            tree.skills[skill_index].points += 1;
+            tree.points_remaining -= 1;
+        }
+    }
+    return tree;
 }
 
 // Propagate result back through the graph
@@ -33,9 +40,4 @@ function backpropagate() {
 // Performs MCTS by sampling games and returns the action
 function think() {
 
-}
-
-
-function is_legal_untried_action() {
-    
 }

@@ -1,17 +1,14 @@
 // Note: might want to consider max win rates of children nodes
 
+// skill == action
 class Skill {
-    constructor(name, tags, row, maxPoints, branch, state) {
+    constructor(name, tags, row, maxPoints, branch) {
         this.name = name;
         this.tags = tags;
         this.row = row;
         this.points = 0;
         this.maxPoints = maxPoints;
         this.branch = branch;
-        this.state = {"crits": 0,
-                      "melee": 0,
-                      "ranged": 0,
-                      "adrenaline": 0}
     }
 
     is_legal() {
@@ -20,11 +17,53 @@ class Skill {
     
 };
 
+class Node {
+    constructor(parent, parent_action, untried_skills) {
+        this.parent = parent;
+        this.parent_action = parent_action;
+        this.untried_skills = untried_skills;
+        this.child_nodes = new Map();
+        this.visits = 0;
+        this.score = 0;
+    }
+}
+
+class Simulator {
+    nextState(skill_tree, skill_index) {
+        let new_tree = new SkillTree(skill_tree.skills, skill_tree.points_remaining, skill_tree.rows);
+        if (new_tree.skills[skill_index].is_legal()) {
+            new_tree.skills[skill_index].points += 1;
+            new_tree.rows[new_tree.skills[skill_index].branch.name].addPoint();
+            if (new_tree.skills[skill_index].points === new_tree.skills[skill_index].maxPoints) {
+                new_tree.skills.splice(skill_index, 1);
+            }
+            new_tree.points_remaining -= 1;
+        }
+        return new_tree;
+    }
+
+    legalActions(skill_tree) {
+        return skill_tree.skills();
+    }
+
+    isEnded(skill_tree) {
+        if (skill_tree.points_remaining === 0) {
+            return true;
+        }
+        return false;
+    }
+
+    getScore(skill_tree) {
+        return 1;
+    }
+}
+
 class SkillTree {
-    constructor(points_remaining, rows) {
-        this.skills = [];
+    constructor(skills, points_remaining, rows, attribute_values) {
+        this.skills = skills;
         this.points_remaining = points_remaining;
         this.rows = rows;
+        this.attribute_values = attribute_values;
     }
 
     addPoint(skill_index) {
@@ -56,41 +95,91 @@ class Branch {
 }
 
 class MCTS {
-    constructor(tree, num_nodes, explore_factor) {
-        this.tree = tree;
+    constructor(num_nodes, explore_factor, simulator) {
         this.num_nodes = num_nodes;
         this.explore_factor = explore_factor;
+        this.simulator = simulator;
     }
 
     // Traverse graph using UCT function until leaf node is reached
-    traverse_nodes() {
-        // visits == points 
+    traverse_nodes(node) {
+        let current_node = node;
+        while (current_node.untried_skills.length > 0 && current_node.child_nodes.size > 0) {
+            let max_uct = -1;
+            let max_uct_node = current_node;
+            for (let child_node of current_node.child_nodes.values()) {
+                let uct = child_node.score / child_node.visits + this.explore_factor * Math.sqrt(Math.log(node.parent.visits) / child_node.visits);
+                if (uct > max_uct) {
+                    max_uct = uct;
+                    max_uct_node = child_node;
+                }
+            }
+            current_node = max_uct_node;
+        }
+        return current_node;
     }
 
     // Adds a new leaf to the tree by creating a new child node for the given node.
-    expand_leaf() {
-
+    expand_leaf(node, skill_tree) {
+        let new_node = node;
+        if (node.untried_skills.length > 0) {
+            let move_index = Math.floor(Math.random() * node.untried_skills.length);
+            //let new_action = JSON.parse(JSON.stringify(node.untried_skills[move_index]));
+            skill_tree = this.simulator.nextState(skill_tree, move_index);
+            new_node = new Node(node, move_index, simulator.legalActions(skill_tree));
+            node.untried_skills.splice(move_index, 1);
+            node.child_nodes.set(move_index, new_node);
+        }
+        return new_node;
     }
 
     // Selects random skills until points are depleted
-    rollout() {
-        while(this.tree.points_remaining > 0) {
+    rollout(skill_tree) {
+        while(skill_tree.isEnded !== true) {
             //instead of random we should choose a random skill with a bias towards what they want
             var skill_index = Math.floor(Math.random() * this.tree.skills.length); 
-            this.tree.addPoint(skill_index);
+            skill_tree = this.simulator.nextState(skill_tree, skill_index);
         }
-        return this.tree.skills[skill_index].state;
+        return this.simulator.getScore(skill_tree);
     }
 
     // Propagate result back through the graph
-    backpropagate() {
-    
+    backpropagate(node, score) {
+        while (node.parent !== null) {
+            node.visits += 1;
+            node.score += score;
+            node = node.parent;
+        }
+        node.score += score;
+        node.visits += 1;
+        return node;
     }
 
     // Performs MCTS by sampling games and returns the action
-    think() {
-
+    think(skill_tree) {
+        let root_node = new Node(null, this.simulator.legalActions(skill_tree));
+        for (let step = 0; step < this.num_nodes; step++) {
+            let sampled_tree = skill_tree;
+            let node = root_node;
+            node = this.traverse_nodes(node, sampled_tree);
+            let chosen_node = node;
+            let chosen_actions = [];
+            while (chosen_node.parent !== null) {
+                chosen_actions.push(chosen_node.parent_action);
+                chosen_node = chosen_node.parent;
+            }
+            for (let i = chosen_actions.length - 1; i >= 0; i--) {
+                sampled_tree = this.simulator.nextState(sampled_tree, chosen_actions[i]);
+            }
+            if (sampled_tree.isEnded() !== true) {
+                node = this.expand_leaf(node, sampled_tree);
+                sampled_tree = this.simulator.nextState(sampled_tree, node.parent_action);
+                let score = this.rollout(sampled_tree);
+                this.backpropagate(node, score);
+            }
+        }
     }
+
 }
 
 function createTree() {
@@ -101,7 +190,10 @@ function createTree() {
 
     var tree_rows = {"combat": combat, "signs": signs, "alchemy": alchemy, "general": general};
 
-    var tree = new SkillTree(50, tree_rows);
+    var tree = new SkillTree([], 50, tree_rows, {"crits": 0,
+        "melee": 0,
+        "ranged": 0,
+        "adrenaline": 0});
 
     let combat_first_row = [];
     let muscleMemory = new Skill("Muscle Memory", [], 0, 5, combat);
@@ -275,7 +367,8 @@ function createTree() {
 }
 
 const tree = createTree();
-const mcts = new MCTS(tree, 100, 2);
+const simulator = new Simulator();
+const mcts = new MCTS(100, 2, simulator);
 mcts.rollout();
 console.log(tree);
 

@@ -9,7 +9,7 @@ class Skill {
     row: Number;
     maxPoints: Number;
 
-    constructor(name: String, tags: Array<Tag>, points: number, row: Number, maxPoints: Number) {
+    constructor(name: String, tags: Array<String>, points: number, row: Number, maxPoints: Number) {
         this.name = name;
         this.tags = tags;
         this.points = points;

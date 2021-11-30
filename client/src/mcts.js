@@ -1,12 +1,17 @@
 // Note: might want to consider max win rates of children nodes
 
 class Skill {
-    constructor(name, tags, row, maxPoints, branch) {
+    constructor(name, tags, row, maxPoints, branch, state) {
         this.name = name;
         this.tags = tags;
         this.row = row;
+        this.points = 0;
         this.maxPoints = maxPoints;
         this.branch = branch;
+        this.state = {"crits": 0,
+                      "melee": 0,
+                      "ranged": 0,
+                      "adrenaline": 0}
     }
 
     is_legal() {
@@ -16,24 +21,23 @@ class Skill {
 };
 
 class SkillTree {
-    constructor(points_remaining, state, rows) {
+    constructor(points_remaining, rows) {
         this.skills = [];
         this.points_remaining = points_remaining;
         this.rows = rows;
-        this.state = state;
+    }
+
+    addPoint(skill_index) {
+        if (this.skills[skill_index].is_legal()) {
+            this.skills[skill_index].points += 1;
+            this.rows[this.skills[skill_index].branch.name].addPoint();
+            if (this.skills[skill_index].points === this.skills[skill_index].maxPoints) {
+                this.skills.splice(skill_index, 1);
+            }
+            this.points_remaining -= 1;
+        }
     }
 };
-
-//example attributes: will need to be changed
-class AttributesState {
-    // attributes should add up to 100
-    constructor(combat, stealth, defense, alchemy) {
-        this.combat = 25;
-        this.stealth = 25;
-        this.defense = 25;
-        this.alchemy = 25;
-    }
-}
 
 class Branch {
     constructor(name, row_costs) {
@@ -60,11 +64,10 @@ class MCTS {
 
     // Traverse graph using UCT function until leaf node is reached
     traverse_nodes() {
-
+        // visits == points 
     }
 
     // Adds a new leaf to the tree by creating a new child node for the given node.
-    // Constraints: Must have enough skill points in tree to reach row
     expand_leaf() {
 
     }
@@ -72,15 +75,11 @@ class MCTS {
     // Selects random skills until points are depleted
     rollout() {
         while(this.tree.points_remaining > 0) {
-            let skill_index = Math.floor(Math.random() * this.tree.skills.length); //instead of random we should choose a random skill with a bias towards what they want
-
-            if (this.tree.skills[skill_index].is_legal()) {
-                this.tree.skills[skill_index].points += 1;
-                this.tree.rows[this.tree.skills[skill_index].branch].addPoint();
-                this.tree.points_remaining -= 1;
-            }
+            //instead of random we should choose a random skill with a bias towards what they want
+            var skill_index = Math.floor(Math.random() * this.tree.skills.length); 
+            this.tree.addPoint(skill_index);
         }
-    // return win values of all skills
+        return this.tree.skills[skill_index].state;
     }
 
     // Propagate result back through the graph
@@ -102,7 +101,7 @@ function createTree() {
 
     var tree_rows = {"combat": combat, "signs": signs, "alchemy": alchemy, "general": general};
 
-    var tree = new SkillTree(20, new AttributesState(), tree_rows);
+    var tree = new SkillTree(50, tree_rows);
 
     let combat_first_row = [];
     let muscleMemory = new Skill("Muscle Memory", [], 0, 5, combat);
@@ -277,7 +276,8 @@ function createTree() {
 
 const tree = createTree();
 const mcts = new MCTS(tree, 100, 2);
-console.log(mcts);
+mcts.rollout();
+console.log(tree);
 
 //http://www.rpg-gaming.com/tw3.html
 //https://www.gosunoob.com/witcher-3/skill-calculator/

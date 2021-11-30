@@ -27,7 +27,7 @@ class Skill {
     
 };
 
-let tree = new SkillTree([]);
+export const tree = new SkillTree([]);
 
 let muscleMemory = new Skill("Muscle Memory", [], 0, 0, 5)
 let strengthTraining = new Skill("Strength Training", [], 0, 0, 5)
@@ -66,40 +66,70 @@ let activeShield = new Skill("Active Shield", [], 0, 1, 3)
 let puppet = new Skill("Puppet", [], 0, 1, 3)
 
 let aardIntensity = new Skill("Aard Intensity", [], 0, 2, 5)
+tree.skills.push(aardIntensity);
 let igniIntensity = new Skill("Igni Intensity", [], 0, 2, 5)
+tree.skills.push(igniIntensity);
 let yrdenIntensity = new Skill("Yrden Intensity", [], 0, 2, 5)
+tree.skills.push(yrdenIntensity);
 let quenIntensity = new Skill("Quen Intensity", [], 0, 2, 5)
+tree.skills.push(quenIntensity);
 let axiiIntensity = new Skill("Razor Focus", [], 0, 2, 5)
+tree.skills.push(axiiIntensity);
 
 let shockWave = new Skill("Shock Wave", [], 0, 3, 5)
+tree.skills.push(shockWave);
 let pyromanica = new Skill("Pyromanica", [], 0, 3, 5)
+tree.skills.push(pyromanica);
 let superchargedGlyphs = new Skill("Supercharged Glyphs", [], 0, 3, 5)
+tree.skills.push(superchargedGlyphs);
 let quenDischarge = new Skill("Quen Discharge", [], 0, 3, 5)
+tree.skills.push(quenDischarge);
 let domination = new Skill("Domination", [], 0, 3, 3)
+tree.skills.push(domination);
 
 let heightenedTolerance = new Skill("Heightened Tolerance", [], 0, 0, 5)
+tree.skills.push(heightenedTolerance);
 let poisonedBlades = new Skill("Poisoned Blades", [], 0, 0, 5)
+tree.skills.push(poisonedBlades);
 let steadyAim = new Skill("Steady Aim", [], 0, 0, 3)
+tree.skills.push(steadyAim);
 let acquiredTolerance = new Skill("Acquired Tolerance", [], 0, 0, 3)
+tree.skills.push(acquiredTolerance);
 let frenzy = new Skill("Frenzy", [], 0, 0, 3)
+tree.skills.push(frenzy);
 
 let refreshment = new Skill("Refreshment", [], 0, 1, 5)
+tree.skills.push(refreshment);
 let protectiveCoating = new Skill("Protective Coating", [], 0, 1, 5)
+tree.skills.push(protectiveCoating);
 let pyrotechnics = new Skill("Pyrotechnics", [], 0, 1, 5)
+tree.skills.push(pyrotechnics);
 let tissueTransmutation = new Skill("Tissue Transmutation", [], 0, 1, 5)
+tree.skills.push(tissueTransmutation);
 let endurePain = new Skill("Endure Pain", [], 0, 1, 5)
+tree.skills.push(endurePain);
 
 let sunAndStars = new Skill("Sun and Stars", [], 0, 2, 3)
+tree.skills.push(sunAndStars);
 let survivalInstinct = new Skill("Surival Instinct", [], 0, 2, 3)
+tree.skills.push(survivalInstinct);
 let catSchoolTechniques = new Skill("Cat School Techniques", [], 0, 2, 5)
+tree.skills.push(catSchoolTechniques);
 let griffinSchoolTechniques = new Skill("Griffin School Techniques", [], 0, 2, 5)
+tree.skills.push(griffinSchoolTechniques);
 let bearSchoolTechniques = new Skill("Bear School Techniques", [], 0, 2, 5)
+tree.skills.push(bearSchoolTechniques);
 
 let steadyShot = new Skill("Steady Shot", [], 0, 0, 1)
+tree.skills.push(steadyShot);
 let rageManagement = new Skill("Rage Management", [], 0, 0, 1)
-let focus = new Skill("Focus", [], 0, 0, 1)
+tree.skills.push(rageManagement);
+let focusGen = new Skill("Focus", [], 0, 0, 1)
+tree.skills.push(focusGen);
 let adrenalineBurst = new Skill("Adrenaline Burst", [], 0, 0, 1)
+tree.skills.push(adrenalineBurst);
 let metabolismControl = new Skill("Metabolism Control", [], 0, 0, 1)
+tree.skills.push(metabolismControl);
 
 //http://www.rpg-gaming.com/tw3.html
 //https://www.gosunoob.com/witcher-3/skill-calculator/

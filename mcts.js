@@ -1,7 +1,9 @@
 // Note: might want to consider max win rates of children nodes
+import tree from './skills.ts'
 
 num_nodes = 1000
 explore_factor = 2
+console.log(tree.skills);
 
 function main() {
     
@@ -31,4 +33,9 @@ function backpropagate() {
 // Performs MCTS by sampling games and returns the action
 function think() {
 
+}
+
+
+function is_legal_untried_action() {
+    
 }

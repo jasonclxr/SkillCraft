@@ -1,5 +1,9 @@
-export interface SkillTree {
-    skills: Array<Skill>
+class SkillTree {
+    skills: Array<Skill>;
+
+    constructor(skills: Array<Skill>) {
+        this.skills = skills;
+    }
 };
 
 class Skill {

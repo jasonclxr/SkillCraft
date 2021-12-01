@@ -10,11 +10,11 @@ function App() {
     <AppContextProvider>
       <Container>
         <Router>
-            <Routes>
-                <Route exact path="/" element={<Home />} />
-            </Routes>
+          <Routes>
+            <Route exact path="/" element={<Home />} />
+          </Routes>
         </Router>
-        </Container>
+      </Container>
     </AppContextProvider>
   );
 }

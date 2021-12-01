@@ -17,7 +17,7 @@ class Skill {
     
 };
 
-class Node {
+class MCTSNode {
     constructor(parent, parent_action, untried_skills) {
         this.parent = parent;
         this.parent_action = parent_action;
@@ -29,21 +29,20 @@ class Node {
 }
 
 class Simulator {
-    nextState(skill_tree, skill_index) {
-        let new_tree = new SkillTree(skill_tree.skills, skill_tree.points_remaining, skill_tree.rows);
-        if (new_tree.skills[skill_index].is_legal()) {
-            new_tree.skills[skill_index].points += 1;
-            new_tree.rows[new_tree.skills[skill_index].branch.name].addPoint();
-            if (new_tree.skills[skill_index].points === new_tree.skills[skill_index].maxPoints) {
-                new_tree.skills.splice(skill_index, 1);
-            }
-            new_tree.points_remaining -= 1;
-        }
+    nextState(skill_tree, skill_name) {
+        let new_tree = new SkillTree(skill_tree.skills, skill_tree.points_remaining, skill_tree.attribute_values, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row);
+        new_tree.addPoint(skill_name);
         return new_tree;
     }
 
     legalActions(skill_tree) {
-        return skill_tree.skills();
+        let legal_actions = [];
+        for (let [key, value] of skill_tree.skills.entries()) {
+            if (skill_tree.isLegal(key)) {
+                legal_actions.push(key);
+            }
+        }
+        return legal_actions;
     }
 
     isEnded(skill_tree) {
@@ -59,40 +58,87 @@ class Simulator {
 }
 
 class SkillTree {
-    constructor(skills, points_remaining, rows, attribute_values) {
+    constructor(skills, points_remaining, attribute_values, combat_count, combat_row, signs_count, signs_row, alchemy_count, alchemy_row) {
         this.skills = skills;
         this.points_remaining = points_remaining;
-        this.rows = rows;
         this.attribute_values = attribute_values;
+        this.combat_count = combat_count;
+        this.combat_row = combat_row;
+        this.signs_count = signs_count;
+        this.signs_row = signs_row;
+        this.alchemy_count = alchemy_count;
+        this.alchemy_row = alchemy_row;
     }
 
-    addPoint(skill_index) {
-        if (this.skills[skill_index].is_legal()) {
-            this.skills[skill_index].points += 1;
-            this.rows[this.skills[skill_index].branch.name].addPoint();
-            if (this.skills[skill_index].points === this.skills[skill_index].maxPoints) {
-                this.skills.splice(skill_index, 1);
+    addPoint(skill_name) {
+        if (this.skills.get(skill_name).is_legal()) {
+            this.skills.get(skill_name).points += 1;
+            let branch_name = this.skills.get(skill_name).branch;
+            if (branch_name === "combat") {
+                this.combat_count++;
+                if (this.combat_count >= 30) {
+                    this.combat_row = 3;
+                } else if (this.combat_count >= 20) {
+                    this.combat_row = 2;
+                } else if (this.combat_count >= 8) {
+                    this.combat_row = 1;
+                } else {
+                    this.combat_row = 0;
+                }
+            } else if (branch_name === "signs") {
+                this.signs_count++;
+                if (this.signs_count >= 28) {
+                    this.signs_row = 3;
+                } else if (this.signs_count >= 18) {
+                    this.signs_row = 2;
+                } else if (this.signs_count >= 6) {
+                    this.signs_row = 1;
+                } else {
+                    this.signs_row = 0;
+                }
+            } else if (branch_name === "alchemy") {
+                this.alchemy_count++;
+                if (this.alchemy_count >= 28) {
+                    this.alchemy_row = 3;
+                } else if (this.alchemy_count >= 20) {
+                    this.alchemy_row = 2;
+                } else if (this.alchemy_count >= 8) {
+                    this.alchemy_row = 1;
+                } else {
+                    this.alchemy_row = 0;
+                }
             }
             this.points_remaining -= 1;
         }
     }
-};
 
-class Branch {
-    constructor(name, row_costs) {
-        this.name = name;
-        this.row_costs = row_costs;
-        this.points = 0; 
-        this.current_row = 0;
-    }
-
-    addPoint() {
-        this.points += 1;
-        if (this.current_row + 1 < this.row_costs.length && this.points >= this.row_costs[this.current_row + 1]) {
-            this.current_row += 1;
+    isLegal(skill_name) {
+        let skill = this.skills.get(skill_name);
+        if (skill.is_legal() === false) {
+            return false;
         }
+        let branch_name = skill.branch;
+        if (branch_name === "general") {
+            return true;
+        }
+        if (branch_name === "combat") {
+            if (skill.row > this.combat_row) {
+                return false;
+            }
+        }
+        else if (branch_name === "signs") {
+            if (skill.row > this.signs_row) {
+                return false;
+            }
+        }
+        else if (branch_name === "alchemy") {
+            if (skill.row > this.alchemy_row) {
+                return false;
+            }
+        }
+        return true;
     }
-}
+};
 
 class MCTS {
     constructor(num_nodes, explore_factor, simulator) {
@@ -124,21 +170,23 @@ class MCTS {
         let new_node = node;
         if (node.untried_skills.length > 0) {
             let move_index = Math.floor(Math.random() * node.untried_skills.length);
-            //let new_action = JSON.parse(JSON.stringify(node.untried_skills[move_index]));
-            skill_tree = this.simulator.nextState(skill_tree, move_index);
-            new_node = new Node(node, move_index, simulator.legalActions(skill_tree));
+            let new_action = node.untried_skills[move_index];
+            skill_tree = this.simulator.nextState(skill_tree, new_action);
+            new_node = new MCTSNode(node, new_action, simulator.legalActions(skill_tree));
             node.untried_skills.splice(move_index, 1);
-            node.child_nodes.set(move_index, new_node);
+            node.child_nodes.set(new_action, new_node);
         }
         return new_node;
     }
 
     // Selects random skills until points are depleted
     rollout(skill_tree) {
-        while(skill_tree.isEnded !== true) {
+        //console.log(skill_tree);
+        while(this.simulator.isEnded(skill_tree) !== true) {
             //instead of random we should choose a random skill with a bias towards what they want
-            var skill_index = Math.floor(Math.random() * this.tree.skills.length); 
-            skill_tree = this.simulator.nextState(skill_tree, skill_index);
+            var legal_actions = this.simulator.legalActions(skill_tree);
+            var move_index = Math.floor(Math.random() * legal_actions.length); 
+            skill_tree = this.simulator.nextState(skill_tree, legal_actions[move_index]);
         }
         return this.simulator.getScore(skill_tree);
     }
@@ -157,11 +205,11 @@ class MCTS {
 
     // Performs MCTS by sampling games and returns the action
     think(skill_tree) {
-        let root_node = new Node(null, this.simulator.legalActions(skill_tree));
+        let root_node = new MCTSNode(null, null, this.simulator.legalActions(skill_tree));
         for (let step = 0; step < this.num_nodes; step++) {
             let sampled_tree = skill_tree;
             let node = root_node;
-            node = this.traverse_nodes(node, sampled_tree);
+            node = this.traverse_nodes(node);
             let chosen_node = node;
             let chosen_actions = [];
             while (chosen_node.parent !== null) {
@@ -178,198 +226,187 @@ class MCTS {
                 this.backpropagate(node, score);
             }
         }
+        let maximum_score = -1;
+        let action = null;
+        for (let [key, skill_node] of root_node.child_nodes) {
+            if (skill_node.score > maximum_score) {
+                maximum_score = skill_node.score;
+                action = key;
+            }
+        }
+        return action;
     }
 
 }
 
 function createTree() {
-    var combat = new Branch("combat", [0, 8, 20, 30]);
-    var signs = new Branch("signs", [0, 6, 18, 28]);
-    var alchemy = new Branch("alchemy", [0, 8, 20, 28]);
-    var general = new Branch("general", [0]);
 
-    var tree_rows = {"combat": combat, "signs": signs, "alchemy": alchemy, "general": general};
-
-    var tree = new SkillTree([], 50, tree_rows, {"crits": 0,
+    var tree = new SkillTree(new Map(), 50, {"crits": 0,
         "melee": 0,
         "ranged": 0,
-        "adrenaline": 0});
+        "adrenaline": 0}, 0, 0, 0, 0, 0, 0);
 
-    let combat_first_row = [];
-    let muscleMemory = new Skill("Muscle Memory", [], 0, 5, combat);
-    combat_first_row.push(muscleMemory);
-    let strengthTraining = new Skill("Strength Training", [], 0, 5, combat);
-    combat_first_row.push(strengthTraining);
-    let arrowDeflection = new Skill("Arrow Deflection", [], 0, 3, combat);
-    combat_first_row.push(arrowDeflection);
-    let lightningReflexes = new Skill("Lightning Reflexes", [], 0, 3, combat);
-    combat_first_row.push(lightningReflexes);
-    let resolve = new Skill("Resolve", [], 0, 5, combat);
-    combat_first_row.push(resolve);
+    let muscleMemory = new Skill("Muscle Memory", [], 0, 5, "combat");
+    tree.skills.set("Muscle Memory", muscleMemory);
+    let strengthTraining = new Skill("Strength Training", [], 0, 5, );
+    tree.skills.set("Strength Training", strengthTraining);
+    let arrowDeflection = new Skill("Arrow Deflection", [], 0, 3, "combat");
+    tree.skills.set("Arrow Deflection", arrowDeflection);
+    let lightningReflexes = new Skill("Lightning Reflexes", [], 0, 3, "combat");
+    tree.skills.set("Lightning Reflexes", lightningReflexes);
+    let resolve = new Skill("Resolve", [], 0, 5, "combat");
+    tree.skills.set("Resolve", resolve);
 
-    let combat_second_row = [];
-    let preciseBlows = new Skill("Precise Blows", [], 1, 5, combat);
-    combat_second_row.push(preciseBlows);
-    let crushingBlows = new Skill("Crushing Blows", [], 1, 5, combat);
-    combat_second_row.push(crushingBlows);
-    let fleetFooted = new Skill("Fleet Footed", [], 1, 5, combat);
-    combat_second_row.push(fleetFooted);
-    let coldBlood = new Skill("Cold Blood", [], 1, 5, combat);
-    combat_second_row.push(coldBlood);
-    let undying = new Skill("Undying", [], 1, 5, combat);
-    combat_second_row.push(undying);
+    let preciseBlows = new Skill("Precise Blows", [], 1, 5, "combat");
+    tree.skills.set("Precise Blows", preciseBlows);
+    let crushingBlows = new Skill("Crushing Blows", [], 1, 5, "combat");
+    tree.skills.set("Crushing Blows", crushingBlows);
+    let fleetFooted = new Skill("Fleet Footed", [], 1, 5, "combat");
+    tree.skills.set("Fleet Footed", fleetFooted);
+    let coldBlood = new Skill("Cold Blood", [], 1, 5, "combat");
+    tree.skills.set("Cold Blood", coldBlood);
+    let undying = new Skill("Undying", [], 1, 5, "combat");
+    tree.skills.set("Undying", undying);
 
-    let combat_third_row = [];
-    let whirl = new Skill("Whirl", [], 2, 5, combat);
-    combat_third_row.push(whirl);
-    let rend = new Skill("Crushing Blows", [], 2, 5, combat);
-    combat_third_row.push(rend);
-    let counterAttack = new Skill("Counter Attack", [], 2, 3, combat);
-    combat_third_row.push(counterAttack);
-    let anatomicalKnowledge = new Skill("Anatomical Knowledge", [], 2, 5, combat);
-    combat_third_row.push(anatomicalKnowledge);
-    let razorFocus = new Skill("Razor Focus", [], 2, 5, combat);
-    combat_third_row.push(razorFocus);
+    let whirl = new Skill("Whirl", [], 2, 5, "combat");
+    tree.skills.set("Whirl", whirl);
+    let rend = new Skill("Crushing Blows", [], 2, 5, "combat");
+    tree.skills.set("Rend", rend);
+    let counterAttack = new Skill("Counter Attack", [], 2, 3, "combat");
+    tree.skills.set("Counter Attack", counterAttack);
+    let anatomicalKnowledge = new Skill("Anatomical Knowledge", [], 2, 5, "combat");
+    tree.skills.set("Anatomical Knowledge", anatomicalKnowledge);
+    let razorFocus = new Skill("Razor Focus", [], 2, 5, "combat");
+    tree.skills.set("Razor Focus", razorFocus);
 
-    let combat_fourth_row = [];
-    let cripplingStrikes = new Skill("Crippling Strikes", [], 3, 5, combat);
-    combat_fourth_row.push(cripplingStrikes);
-    let sunderArmor = new Skill("Sunder Armor", [], 3, 5, combat);
-    combat_fourth_row.push(sunderArmor);
-    let deadlyPrecision = new Skill("Deadly Precision", [], 3, 2, combat);
-    combat_fourth_row.push(deadlyPrecision);
-    let cripplingShot = new Skill("Crippling Shot", [], 3, 5, combat);
-    combat_fourth_row.push(cripplingShot);
-    let floodOfAnger = new Skill("Flood of Anger", [], 3, 5, combat);
-    combat_fourth_row.push(floodOfAnger);
+    let cripplingStrikes = new Skill("Crippling Strikes", [], 3, 5, "combat");
+    tree.skills.set("Crippling Strikes", cripplingStrikes);
+    let sunderArmor = new Skill("Sunder Armor", [], 3, 5, "combat");
+    tree.skills.set("Sunder Armor", sunderArmor);
+    let deadlyPrecision = new Skill("Deadly Precision", [], 3, 2, "combat");
+    tree.skills.set("Deadly Precision", deadlyPrecision);
+    let cripplingShot = new Skill("Crippling Shot", [], 3, 5, "combat");
+    tree.skills.set("Crippling Shot", cripplingShot);
+    let floodOfAnger = new Skill("Flood of Anger", [], 3, 5, "combat");
+    tree.skills.set("Flood of Anger", floodOfAnger);
 
-    let signs_first_row = [];
-    let farReachingAard = new Skill("Far Reaching Aard", [], 0, 3, signs);
-    signs_first_row.push(farReachingAard);
-    let meltArmor = new Skill("Strength Training", [], 0, 5, signs);
-    signs_first_row.push(meltArmor);
-    let sustainedGlyphs = new Skill("Sustained Glyphs", [], 0, 2, signs);
-    signs_first_row.push(sustainedGlyphs);
-    let explodingShield = new Skill("Exploding Shield", [], 0, 3, signs);
-    signs_first_row.push(explodingShield);
-    let delusion = new Skill("Delusion", [], 0, 3, signs);
-    signs_first_row.push(delusion);
+    let farReachingAard = new Skill("Far Reaching Aard", [], 0, 3, "signs");
+    tree.skills.set("Far Reaching Aard", farReachingAard);
+    let meltArmor = new Skill("Strength Training", [], 0, 5, "signs");
+    tree.skills.set("Melt Armor", meltArmor);
+    let sustainedGlyphs = new Skill("Sustained Glyphs", [], 0, 2, "signs");
+    tree.skills.set("Sustained Glyphs", sustainedGlyphs);
+    let explodingShield = new Skill("Exploding Shield", [], 0, 3, "signs");
+    tree.skills.set("Exploding Shield", explodingShield);
+    let delusion = new Skill("Delusion", [], 0, 3, "signs");
+    tree.skills.set("Delusion", delusion);
 
-    let signs_second_row = [];
-    let aardSweep = new Skill("Aard Sweep", [], 1, 3, signs);
-    signs_second_row.push(aardSweep);
-    let firestream = new Skill("Firestream", [], 1, 3, signs);
-    signs_second_row.push(firestream);
-    let magicTrap = new Skill("Magic Trap", [], 1, 3, signs);
-    signs_second_row.push(magicTrap);
-    let activeShield = new Skill("Active Shield", [], 1, 3, signs);
-    signs_second_row.push(activeShield);
-    let puppet = new Skill("Puppet", [], 1, 3, signs);
-    signs_second_row.push(puppet);
+    let aardSweep = new Skill("Aard Sweep", [], 1, 3, "signs");
+    tree.skills.set("Aard Sweep", aardSweep);
+    let firestream = new Skill("Firestream", [], 1, 3, "signs");
+    tree.skills.set("Firestream", firestream);
+    let magicTrap = new Skill("Magic Trap", [], 1, 3, "signs");
+    tree.skills.set("Magic Trap", magicTrap);
+    let activeShield = new Skill("Active Shield", [], 1, 3, "signs");
+    tree.skills.set("Active Shield", activeShield);
+    let puppet = new Skill("Puppet", [], 1, 3, "signs");
+    tree.skills.set("Puppet", puppet);
 
-    let signs_third_row = [];
-    let aardIntensity = new Skill("Aard Intensity", [], 2, 5, signs);
-    signs_third_row.push(aardIntensity);
-    let igniIntensity = new Skill("Igni Intensity", [], 2, 5, signs);
-    signs_third_row.push(igniIntensity);
-    let yrdenIntensity = new Skill("Yrden Intensity", [], 2, 5, signs);
-    signs_third_row.push(yrdenIntensity);
-    let quenIntensity = new Skill("Quen Intensity", [], 2, 5, signs);
-    signs_third_row.push(quenIntensity);
-    let axiiIntensity = new Skill("Razor Focus", [], 2, 5, signs);
-    signs_third_row.push(axiiIntensity);
+    let aardIntensity = new Skill("Aard Intensity", [], 2, 5, "signs");
+    tree.skills.set("Aard Intensity", aardIntensity);
+    let igniIntensity = new Skill("Igni Intensity", [], 2, 5, "signs");
+    tree.skills.set("Igni Intensity", igniIntensity);
+    let yrdenIntensity = new Skill("Yrden Intensity", [], 2, 5, "signs");
+    tree.skills.set("Yrden Intensity", yrdenIntensity);
+    let quenIntensity = new Skill("Quen Intensity", [], 2, 5, "signs");
+    tree.skills.set("Quen Intensity", quenIntensity);
+    let axiiIntensity = new Skill("Razor Focus", [], 2, 5, "signs");
+    tree.skills.set("Axii Intensity", axiiIntensity);
 
-    let signs_fourth_row = [];
-    let shockWave = new Skill("Shock Wave", [], 3, 5, signs);
-    signs_fourth_row.push(shockWave);
-    let pyromanica = new Skill("Pyromanica", [], 3, 5, signs);
-    signs_fourth_row.push(pyromanica);
-    let superchargedGlyphs = new Skill("Supercharged Glyphs", [], 3, 5, signs);
-    signs_fourth_row.push(superchargedGlyphs);
-    let quenDischarge = new Skill("Quen Discharge", [], 3, 5, signs);
-    signs_fourth_row.push(quenDischarge);
-    let domination = new Skill("Domination", [], 3, 3, signs);
-    signs_fourth_row.push(domination);
+    let shockWave = new Skill("Shock Wave", [], 3, 5, "signs");
+    tree.skills.set("Shock Wave", shockWave);
+    let pyromanica = new Skill("Pyromanica", [], 3, 5, "signs");
+    tree.skills.set("Pyromanica", pyromanica);
+    let superchargedGlyphs = new Skill("Supercharged Glyphs", [], 3, 5, "signs");
+    tree.skills.set("Supercharged Glyphs", superchargedGlyphs);
+    let quenDischarge = new Skill("Quen Discharge", [], 3, 5, "signs");
+    tree.skills.set("Quen Discharge", quenDischarge);
+    let domination = new Skill("Domination", [], 3, 3, "signs");
+    tree.skills.set("Domination", domination);
 
-    let alchemy_first_row = [];
-    let heightenedTolerance = new Skill("Heightened Tolerance", [], 0, 5, alchemy);
-    alchemy_first_row.push(heightenedTolerance);
-    let poisonedBlades = new Skill("Poisoned Blades", [], 0, 5, alchemy);
-    alchemy_first_row.push(poisonedBlades);
-    let steadyAim = new Skill("Steady Aim", [], 0, 3, alchemy);
-    alchemy_first_row.push(steadyAim);
-    let acquiredTolerance = new Skill("Acquired Tolerance", [], 0, 3, alchemy);
-    alchemy_first_row.push(acquiredTolerance);
-    let frenzy = new Skill("Frenzy", [], 0, 3, alchemy);
-    alchemy_first_row.push(frenzy);
+    let heightenedTolerance = new Skill("Heightened Tolerance", [], 0, 5, "alchemy");
+    tree.skills.set("Heightened Tolerance", heightenedTolerance);
+    let poisonedBlades = new Skill("Poisoned Blades", [], 0, 5, "alchemy");
+    tree.skills.set("Poisoned Blades", poisonedBlades);
+    let steadyAim = new Skill("Steady Aim", [], 0, 3, "alchemy");
+    tree.skills.set("Steady Aim", steadyAim);
+    let acquiredTolerance = new Skill("Acquired Tolerance", [], 0, 3, "alchemy");
+    tree.skills.set("Acquired Tolerance", acquiredTolerance);
+    let frenzy = new Skill("Frenzy", [], 0, 3, "alchemy");
+    tree.skills.set("Frenzy", frenzy);
 
-    let alchemy_second_row = [];
-    let refreshment = new Skill("Refreshment", [], 1, 5, alchemy);
-    alchemy_second_row.push(refreshment);
-    let protectiveCoating = new Skill("Protective Coating", [], 1, 5, alchemy);
-    alchemy_second_row.push(protectiveCoating);
-    let pyrotechnics = new Skill("Pyrotechnics", [], 1, 5, alchemy);
-    alchemy_second_row.push(pyrotechnics);
-    let tissueTransmutation = new Skill("Tissue Transmutation", [], 1, 5, alchemy);
-    alchemy_second_row.push(tissueTransmutation);
-    let endurePain = new Skill("Endure Pain", [], 1, 5, alchemy);
-    alchemy_second_row.push(endurePain);
+    let refreshment = new Skill("Refreshment", [], 1, 5, "alchemy");
+    tree.skills.set("Refreshment", refreshment);
+    let protectiveCoating = new Skill("Protective Coating", [], 1, 5, "alchemy");
+    tree.skills.set("Protective Coating", protectiveCoating);
+    let pyrotechnics = new Skill("Pyrotechnics", [], 1, 5, "alchemy");
+    tree.skills.set("Pyrotechnics", pyrotechnics);
+    let tissueTransmutation = new Skill("Tissue Transmutation", [], 1, 5, "alchemy");
+    tree.skills.set("Tissue Transmutation", tissueTransmutation);
+    let endurePain = new Skill("Endure Pain", [], 1, 5, "alchemy");
+    tree.skills.set("Endure Pain", endurePain);
 
-    let alchemy_third_row = [];
-    let delayedRecovery = new Skill("Delayed Recovery", [], 2, 3, alchemy);
-    alchemy_third_row.push(delayedRecovery);
-    let fixative = new Skill("Fixative", [], 2, 3, alchemy);
-    alchemy_third_row.push(fixative);
-    let efficiency = new Skill("Efficiency", [], 2, 5, alchemy);
-    alchemy_third_row.push(efficiency);
-    let synergy = new Skill("Synergy", [], 2, 5, alchemy);
-    alchemy_third_row.push(synergy);
-    let fastMetabolism = new Skill("Fast Metabolism", [], 2, 5, alchemy);
-    alchemy_third_row.push(fastMetabolism);
+    let delayedRecovery = new Skill("Delayed Recovery", [], 2, 3, "alchemy");
+    tree.skills.set("Delayed Recovery", delayedRecovery);
+    let fixative = new Skill("Fixative", [], 2, 3, "alchemy");
+    tree.skills.set("Fixative", fixative);
+    let efficiency = new Skill("Efficiency", [], 2, 5, "alchemy");
+    tree.skills.set("Efficiency", efficiency);
+    let synergy = new Skill("Synergy", [], 2, 5, "alchemy");
+    tree.skills.set("Synergy", synergy);
+    let fastMetabolism = new Skill("Fast Metabolism", [], 2, 5, "alchemy");
+    tree.skills.set("Fast Metabolism", fastMetabolism);
     
-    let alchemy_fourth_row = [];
-    let sideEffects = new Skill("Side Effects", [], 3, 5, alchemy);
-    alchemy_fourth_row.push(sideEffects);
-    let hunterInstinct = new Skill("Hunter Instinct", [], 3, 5, alchemy);
-    alchemy_fourth_row.push(hunterInstinct);
-    let clusterBombs = new Skill("Cluster Bombs", [], 3, 5, alchemy);
-    alchemy_fourth_row.push(clusterBombs);
-    let adaption = new Skill("Adaption", [], 3, 5, alchemy);
-    alchemy_fourth_row.push(adaption);
-    let killingSpree = new Skill("Killing Spree", [], 3, 5, alchemy);
-    alchemy_fourth_row.push(killingSpree);
+    let sideEffects = new Skill("Side Effects", [], 3, 5, "alchemy");
+    tree.skills.set("Side Effects", sideEffects);
+    let hunterInstinct = new Skill("Hunter Instinct", [], 3, 5, "alchemy");
+    tree.skills.set("Hunter Instinct", hunterInstinct);
+    let clusterBombs = new Skill("Cluster Bombs", [], 3, 5, "alchemy");
+    tree.skills.set("Cluster Bombs", clusterBombs);
+    let adaption = new Skill("Adaption", [], 3, 5, "alchemy");
+    tree.skills.set("Adaption", adaption);
+    let killingSpree = new Skill("Killing Spree", [], 3, 5, "alchemy");
+    tree.skills.set("Killing Spree", killingSpree);
 
-    let general_row = [];
-    let sunAndStars = new Skill("Sun and Stars", [], 0, 1, general);
-    general_row.push(sunAndStars);
-    let survivalInstinct = new Skill("Surival Instinct", [], 0, 1, general);
-    general_row.push(survivalInstinct);
-    let catSchoolTechniques = new Skill("Cat School Techniques", [], 0, 1, general);
-    general_row.push(catSchoolTechniques);
-    let griffinSchoolTechniques = new Skill("Griffin School Techniques", [], 0, 1, general);
-    general_row.push(griffinSchoolTechniques);
-    let bearSchoolTechniques = new Skill("Bear School Techniques", [], 0, 1, general);
-    general_row.push(bearSchoolTechniques);
+    let sunAndStars = new Skill("Sun and Stars", [], 0, 1, "general");
+    tree.skills.set("Sun and Stars", sunAndStars);
+    let survivalInstinct = new Skill("Surival Instinct", [], 0, 1, "general");
+    tree.skills.set("Survival Instinct", survivalInstinct);
+    let catSchoolTechniques = new Skill("Cat School Techniques", [], 0, 1, "general");
+    tree.skills.set("Cat School Techniques", catSchoolTechniques);
+    let griffinSchoolTechniques = new Skill("Griffin School Techniques", [], 0, 1, "general");
+    tree.skills.set("Griffin School Techniques", griffinSchoolTechniques);
+    let bearSchoolTechniques = new Skill("Bear School Techniques", [], 0, 1, "general");
+    tree.skills.set("Bear School Techniques", bearSchoolTechniques);
 
-    let steadyShot = new Skill("Steady Shot", [], 0, 1, general);
-    general_row.push(steadyShot);
-    let rageManagement = new Skill("Rage Management", [], 0, 1, general);
-    general_row.push(rageManagement);
-    let focusGen = new Skill("Focus", [], 0, 1, general);
-    general_row.push(focusGen);
-    let adrenalineBurst = new Skill("Adrenaline Burst", [], 0, 1, general);
-    general_row.push(adrenalineBurst);
-    let metabolismControl = new Skill("Metabolism Control", [], 0, 1, general);
-    general_row.push(metabolismControl);
+    let steadyShot = new Skill("Steady Shot", [], 0, 1, "general");
+    tree.skills.set("Steady Shot", steadyShot);
+    let rageManagement = new Skill("Rage Management", [], 0, 1, "general");
+    tree.skills.set("Rage Management", rageManagement);
+    let focusGen = new Skill("Focus", [], 0, 1, "general");
+    tree.skills.set("Focus", focusGen);
+    let adrenalineBurst = new Skill("Adrenaline Burst", [], 0, 1, "general");
+    tree.skills.set("Adrenaline Burst", adrenalineBurst);
+    let metabolismControl = new Skill("Metabolism Control", [], 0, 1, "general");
+    tree.skills.set("Metabolism Control", metabolismControl);
 
-    tree.skills = tree.skills.concat(combat_first_row, signs_first_row, alchemy_first_row, general_row);
     return tree;
 }
 
 const tree = createTree();
 const simulator = new Simulator();
 const mcts = new MCTS(100, 2, simulator);
-mcts.rollout();
+mcts.rollout(tree);
 console.log(tree);
 
 //http://www.rpg-gaming.com/tw3.html

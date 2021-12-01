@@ -3,9 +3,9 @@
 // skill == action
 const copier = require('lodash');
 class Skill {
-    constructor(name, tag, row, maxPoints, branch) {
+    constructor(name, attribute, row, maxPoints, branch) {
         this.name = name;
-        this.tag = tag;
+        this.attribute = attribute;
         this.row = row;
         this.points = 0;
         this.maxPoints = maxPoints;
@@ -32,11 +32,29 @@ class MCTSNode {
         this.visits = 0;
         this.score = 0;
     }
+
+    incrementAttribute(attr_code) {
+        if (attr_code === 0) {
+            this.healing_count++;
+        } else if (attr_code === 1) {
+            this.close_range_count++;
+        } else if (attr_code === 2) {
+            this.ranged_count++;
+        } else if (attr_code === 3) {
+            this.adrenaline_count++;
+        } else if (attr_code === 4) {
+            this.defense_count++;
+        } else if (attr_code === 5) {
+            this.unique_count++;
+        } else {
+            console.error("Attribute does not exist");
+        }
+    }
 }
 
 class Simulator {
     nextState(skill_tree, skill_name) {
-        let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.attribute_values, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row);
+        let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row);
         new_tree.addPoint(skill_name);
         return new_tree;
     }
@@ -67,10 +85,9 @@ class Simulator {
 }
 
 class SkillTree {
-    constructor(skills, points_remaining, attribute_values, combat_count, combat_row, signs_count, signs_row, alchemy_count, alchemy_row) {
+    constructor(skills, points_remaining, combat_count, combat_row, signs_count, signs_row, alchemy_count, alchemy_row) {
         this.skills = skills;
         this.points_remaining = points_remaining;
-        this.attribute_values = attribute_values;
         this.combat_count = combat_count;
         this.combat_row = combat_row;
         this.signs_count = signs_count;
@@ -184,9 +201,11 @@ class MCTS {
         if (node.untried_skills.length > 0) {
             let move_index = Math.floor(Math.random() * node.untried_skills.length);
             let new_action = node.untried_skills[move_index];
+            let skill_attribute = skill_tree.skills.get(new_action).attribute;
             skill_tree = this.simulator.nextState(skill_tree, new_action);
             //add logic for incrementing attributes count
-            new_node = new MCTSNode(node, new_action, this.simulator.legalActions(skill_tree));
+            new_node = new MCTSNode(node, new_action, this.simulator.legalActions(skill_tree), node.healing_count, node.close_range_count, node.ranged_count, node.adrenaline_count, node.defense_count, node.unique_count);
+            new_node.incrementAttribute(skill_attribute);
             if (skill_tree.skills.get(node.untried_skills[move_index]).is_legal() === false) {
                 node.untried_skills.splice(move_index, 1);
             }     
@@ -258,7 +277,7 @@ class MCTS {
 
 function createTree() {
 
-    var tree = new SkillTree(new Map(), 50)
+    var tree = new SkillTree(new Map(), 50, 0, 0, 0, 0, 0, 0)
 
     let muscleMemory = new Skill("Muscle Memory", 1, 0, 5, "combat");
     tree.skills.set("Muscle Memory", muscleMemory);
@@ -417,22 +436,15 @@ function createTree() {
     return tree;
 }
 
-const mcts_tree = createTree();
-const final_tree = createTree();
+let mcts_tree = createTree();
 const simulator = new Simulator();
-const tags_map = {"Healing": 0,
-                    "Close Range": 1,
-                    "Ranged": 2,
-                    "Adrenaline": 3,
-                    "Defensive": 4,
-                    "Unique": 5};
 const mcts = new MCTS(10, 2, simulator);
 let num_points = 50;
 for (let i=0; i < num_points; i++) {
     let skill = mcts.think(mcts_tree);
-    console.log(skill);
-    final_tree.skills.get(skill).points += 1;
+    mcts_tree = simulator.nextState(mcts_tree, skill);
 }
+console.log(mcts_tree);
 
 //http://www.rpg-gaming.com/tw3.html
 //https://www.gosunoob.com/witcher-3/skill-calculator/

@@ -28,7 +28,7 @@ class MCTSNode {
     }
 }
 
-export class Simulator {
+class Simulator {
     nextState(skill_tree, skill_name) {
         let new_tree = new SkillTree(skill_tree.skills, skill_tree.points_remaining, skill_tree.attribute_values, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row);
         new_tree.addPoint(skill_name);
@@ -140,7 +140,7 @@ class SkillTree {
     }
 };
 
-export class MCTS {
+class MCTS {
     constructor(num_nodes, explore_factor, simulator) {
         this.num_nodes = num_nodes;
         this.explore_factor = explore_factor;
@@ -239,7 +239,7 @@ export class MCTS {
 
 }
 
-export function createTree() {
+function createTree() {
 
     var tree = new SkillTree(new Map(), 50, {
         "crits": 0,
@@ -404,6 +404,10 @@ export function createTree() {
 
     return tree;
 }
+
+exports.createTree = createTree;
+exports.MCTS = MCTS;
+exports.Simulator = Simulator;
 
 const tree = createTree();
 const simulator = new Simulator();

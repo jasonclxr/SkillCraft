@@ -44,23 +44,23 @@ const SelectSettings = () => {
     return (
         <Form>
             <Form.Group as={Row} className="mb-3">
-                <Form.Label column sm={1}>
+                <Form.Label column sm={2}>
                     Available Points
                 </Form.Label>
-                <Col sm="auto">
+                <Col>
                     <Form.Control type="number" value={pointCount} onChange={e => setPointCount(parseInt(e.target.value))} />
                 </Col>
-                <Col sm="auto">
+                <Col>
                     {pointCount}
                 </Col>
             </Form.Group>
             {Object.keys(value).map((key, index) => {
                 return (
                     <Form.Group as={Row} className="mb-3" key={index}>
-                        <Form.Label column sm={1}>
+                        <Form.Label column sm={2}>
                             {key}
                         </Form.Label>
-                        <Col sm="auto">
+                        <Col>
                             <Form.Range value={value[key]} onChange={e => calculateSliders(e, key)} min={0} max={100} />
                         </Col>
                         <Col>
@@ -70,7 +70,7 @@ const SelectSettings = () => {
             })}
 
             <Form.Group as={Row} className="mb-3">
-                <Col sm={{ span: 10, offset: 1 }}>
+                <Col>
                     <Button type="submit" onClick={e => handleSubmit(e)}>Sign in</Button>
                 </Col>
             </Form.Group>

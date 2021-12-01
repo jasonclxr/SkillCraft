@@ -31,16 +31,15 @@ class MCTSNode {
 class Simulator {
     constructor() {
         this.healing_sim = 0;
-        this.close_range_sim = .9;
-        this.ranged_sim = .1;
+        this.close_range_sim = 0;
+        this.ranged_sim = 0;
         this.adrenaline_sim = 0;
         this.defense_sim = 0;
-        this.unique_sim = 0;
+        this.unique_sim = .9;
     }
     nextState(skill_tree, skill_name) {
         let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row, skill_tree.healing_count, skill_tree.close_range_count, skill_tree.ranged_count, skill_tree.adrenaline_count, skill_tree.defense_count, skill_tree.unique_count);
         new_tree.addPoint(skill_name);
-        new_tree.addAttribute(skill_name);
         return new_tree;
     }
 
@@ -72,14 +71,13 @@ class Simulator {
         let adrenaline = skill_tree.adrenaline_count / total;
         let defense = skill_tree.defense_count / total;
         let unique = skill_tree.unique_count / total;
-        let score = 0;
-        score -= Math.max(healing, this.healing_sim) - Math.min(healing, this.healing_sim);
-        score -= Math.max(close_range, this.close_range_sim) - Math.min(close_range, this.close_range_sim);
-        score -= Math.max(ranged, this.ranged_sim) - Math.min(ranged, this.ranged_sim);
-        score -= Math.max(adrenaline, this.adrenaline_sim) - Math.min(adrenaline, this.adrenaline_sim);
-        score -= Math.max(defense, this.defense_sim) - Math.min(defense, this.defense_sim);
-        score -= Math.max(unique, this.unique_sim) - Math.min(unique, this.unique_sim);
-        return score;
+        healing = Math.pow((healing - this.healing_sim), 2);
+        close_range = Math.pow((close_range - this.close_range_sim), 2);
+        ranged = Math.pow((ranged - this.ranged_sim), 2);
+        adrenaline = Math.pow((adrenaline - this.adrenaline_sim), 2);
+        defense = Math.pow((defense - this.defense_sim), 2);
+        unique = Math.pow((unique - this.unique_sim), 2);
+        return Math.pow((healing + close_range + ranged + adrenaline + defense + unique), 0.5);
     }
 }
 
@@ -140,27 +138,26 @@ class SkillTree {
                 }
             }
             this.points_remaining -= 1;
+            this.addAttribute(skill_name);
         }
     }
 
     addAttribute(skill_name) {
-        if (this.skills.get(skill_name).is_legal()) {
-            let attr_code = this.skills.get(skill_name).attribute;
-            if (attr_code === 0) {
-                this.healing_count++;
-            } else if (attr_code === 1) {
-                this.close_range_count++;
-            } else if (attr_code === 2) {
-                this.ranged_count++;
-            } else if (attr_code === 3) {
-                this.adrenaline_count++;
-            } else if (attr_code === 4) {
-                this.defense_count++;
-            } else if (attr_code === 5) {
-                this.unique_count++;
-            } else {
-                console.error("Attribute does not exist");
-            }
+        let attr_code = this.skills.get(skill_name).attribute;
+        if (attr_code === 0) {
+            this.healing_count++;
+        } else if (attr_code === 1) {
+            this.close_range_count++;
+        } else if (attr_code === 2) {
+            this.ranged_count++;
+        } else if (attr_code === 3) {
+            this.adrenaline_count++;
+        } else if (attr_code === 4) {
+            this.defense_count++;
+        } else if (attr_code === 5) {
+            this.unique_count++;
+        } else {
+            console.error("Attribute does not exist");
         }
     }
 
@@ -203,9 +200,9 @@ class MCTS {
         let current_node = node;
         let max_uct_node = current_node;
         while (current_node.untried_skills.length > 0 && current_node.child_nodes.size > 0) {
-            let max_uct = 100000;
+            let max_uct = Infinity;
             for (let child_node of current_node.child_nodes.values()) {
-                let uct = 100000;
+                let uct = Infinity;
                 if (node.parent === null) {
                     uct = child_node.score / child_node.visits;
                 } else {
@@ -469,7 +466,6 @@ for (let i=0; i < num_points; i++) {
     console.log(skill);
     mcts_tree = simulator.nextState(mcts_tree, skill);
 }
-console.log(mcts_tree);
 
 //http://www.rpg-gaming.com/tw3.html
 //https://www.gosunoob.com/witcher-3/skill-calculator/

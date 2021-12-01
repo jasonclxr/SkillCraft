@@ -1,6 +1,7 @@
 // Note: might want to consider max win rates of children nodes
 
 // skill == action
+const copier = require('lodash');
 class Skill {
     constructor(name, tags, row, maxPoints, branch) {
         this.name = name;
@@ -13,8 +14,7 @@ class Skill {
 
     is_legal() {
         return this.points < this.maxPoints;
-    }
-    
+    } 
 };
 
 class MCTSNode {
@@ -30,7 +30,7 @@ class MCTSNode {
 
 class Simulator {
     nextState(skill_tree, skill_name) {
-        let new_tree = new SkillTree(skill_tree.skills, skill_tree.points_remaining, skill_tree.attribute_values, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row);
+        let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.attribute_values, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row);
         new_tree.addPoint(skill_name);
         return new_tree;
     }
@@ -74,7 +74,6 @@ class SkillTree {
     }
 
     addPoint(skill_name) {
-        console.log(skill_name);
         if (this.skills.get(skill_name).is_legal()) {
             this.skills.get(skill_name).points += 1;
             let branch_name = this.skills.get(skill_name).branch;
@@ -118,6 +117,7 @@ class SkillTree {
 
     isLegal(skill_name) {
         let skill = this.skills.get(skill_name);
+        //console.log(this.skills);
         if (skill.is_legal() === false) {
             return false;
         }
@@ -162,7 +162,7 @@ class MCTS {
                 if (node.parent === null) {
                     uct = child_node.score / child_node.visits;
                 } else {
-                    uct = child_node.score / child_node.visits + this.explore_factor * Math.sqrt(Math.log(node.parent.visits) / child_node.visits);
+                    uct = child_node.score / child_node.visits + this.explore_factor * Math.sqrt(Math.log(child_node.parent.visits) / child_node.visits);
                 }
                 if (uct > max_uct) {
                     max_uct = uct;
@@ -181,8 +181,10 @@ class MCTS {
             let move_index = Math.floor(Math.random() * node.untried_skills.length);
             let new_action = node.untried_skills[move_index];
             skill_tree = this.simulator.nextState(skill_tree, new_action);
-            new_node = new MCTSNode(node, new_action, simulator.legalActions(skill_tree));
-            node.untried_skills.splice(move_index, 1);
+            new_node = new MCTSNode(node, new_action, this.simulator.legalActions(skill_tree));
+            if (skill_tree.skills.get(node.untried_skills[move_index]).is_legal() === false) {
+                node.untried_skills.splice(move_index, 1);
+            }     
             node.child_nodes.set(new_action, new_node);
         }
         return new_node;
@@ -194,10 +196,7 @@ class MCTS {
             //instead of random we should choose a random skill with a bias towards what they want
             var legal_actions = this.simulator.legalActions(skill_tree);
             var move_index = Math.floor(Math.random() * legal_actions.length);
-            console.log(skill_tree.points_remaining);
-            console.log("legal actions", legal_actions);
-            console.log("move index", move_index);
-            console.log(legal_actions[move_index]);
+            //console.log(legal_actions, move_index, skill_tree.points_remaining);
             skill_tree = this.simulator.nextState(skill_tree, legal_actions[move_index]);
         }
         return this.simulator.getScore(skill_tree);
@@ -220,7 +219,7 @@ class MCTS {
         let root_node = new MCTSNode(null, null, this.simulator.legalActions(skill_tree));
         let sampled_tree = skill_tree;
         let node = root_node;
-        for (let step = 0; step < 1; step++) {
+        for (let step = 0; step < 10; step++) {
             sampled_tree = skill_tree;
             node = root_node;
             node = this.traverse_nodes(node);
@@ -421,8 +420,7 @@ const mcts_tree = createTree();
 const final_tree = createTree();
 const simulator = new Simulator();
 const mcts = new MCTS(10, 2, simulator);
-let num_points = 20;
-
+let num_points = 50;
 for (let i=0; i < num_points; i++) {
     let skill = mcts.think(mcts_tree);
     console.log(skill);

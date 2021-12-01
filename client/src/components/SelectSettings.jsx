@@ -17,20 +17,12 @@ const SelectSettings = () => {
     };
 
     const calculateMaxID = (current_id) => {
-        var maxValue;
-        var maxId;
-        for (let v in value) {
-            var val = value[v];
-            var id = v;
-            if (id == current_id) {
-                continue;
-            }
-            if (maxValue === undefined || maxValue < val) {
-                maxValue = val;
-                maxId = id;
-            }
-        }
-        return maxId;
+        const maxID = Object.entries(value).reduce((a, b) => {
+            if (a[0] === current_id) return b;
+            if (b[0] === current_id) return a;
+            return a[1] > b[1] ? a : b
+        })[0];
+        return maxID;
     }
 
     const calculateSliders = (e, key) => {

@@ -14,7 +14,7 @@ class Skill {
     is_legal() {
         return this.points < this.maxPoints;
     }
-
+    
 };
 
 class MCTSNode {
@@ -37,6 +37,9 @@ class Simulator {
 
     legalActions(skill_tree) {
         let legal_actions = [];
+        if (skill_tree.points_remaining === 0) {
+            return legal_actions;
+        }
         for (let [key, value] of skill_tree.skills.entries()) {
             if (skill_tree.isLegal(key)) {
                 legal_actions.push(key);
@@ -46,7 +49,7 @@ class Simulator {
     }
 
     isEnded(skill_tree) {
-        if (skill_tree.points_remaining === 0) {
+        if (skill_tree.points_remaining < 1) {
             return true;
         }
         return false;
@@ -71,6 +74,7 @@ class SkillTree {
     }
 
     addPoint(skill_name) {
+        console.log(skill_name);
         if (this.skills.get(skill_name).is_legal()) {
             this.skills.get(skill_name).points += 1;
             let branch_name = this.skills.get(skill_name).branch;
@@ -150,11 +154,16 @@ class MCTS {
     // Traverse graph using UCT function until leaf node is reached
     traverse_nodes(node) {
         let current_node = node;
+        let max_uct_node = current_node;
         while (current_node.untried_skills.length > 0 && current_node.child_nodes.size > 0) {
             let max_uct = -1;
-            let max_uct_node = current_node;
             for (let child_node of current_node.child_nodes.values()) {
-                let uct = child_node.score / child_node.visits + this.explore_factor * Math.sqrt(Math.log(node.parent.visits) / child_node.visits);
+                let uct = -1;
+                if (node.parent === null) {
+                    uct = child_node.score / child_node.visits;
+                } else {
+                    uct = child_node.score / child_node.visits + this.explore_factor * Math.sqrt(Math.log(node.parent.visits) / child_node.visits);
+                }
                 if (uct > max_uct) {
                     max_uct = uct;
                     max_uct_node = child_node;
@@ -181,11 +190,14 @@ class MCTS {
 
     // Selects random skills until points are depleted
     rollout(skill_tree) {
-        //console.log(skill_tree);
-        while (this.simulator.isEnded(skill_tree) !== true) {
+        while(this.simulator.isEnded(skill_tree) !== true) {
             //instead of random we should choose a random skill with a bias towards what they want
             var legal_actions = this.simulator.legalActions(skill_tree);
             var move_index = Math.floor(Math.random() * legal_actions.length);
+            console.log(skill_tree.points_remaining);
+            console.log("legal actions", legal_actions);
+            console.log("move index", move_index);
+            console.log(legal_actions[move_index]);
             skill_tree = this.simulator.nextState(skill_tree, legal_actions[move_index]);
         }
         return this.simulator.getScore(skill_tree);
@@ -206,9 +218,11 @@ class MCTS {
     // Performs MCTS by sampling games and returns the action
     think(skill_tree) {
         let root_node = new MCTSNode(null, null, this.simulator.legalActions(skill_tree));
-        for (let step = 0; step < this.num_nodes; step++) {
-            let sampled_tree = skill_tree;
-            let node = root_node;
+        let sampled_tree = skill_tree;
+        let node = root_node;
+        for (let step = 0; step < 1; step++) {
+            sampled_tree = skill_tree;
+            node = root_node;
             node = this.traverse_nodes(node);
             let chosen_node = node;
             let chosen_actions = [];
@@ -219,7 +233,7 @@ class MCTS {
             for (let i = chosen_actions.length - 1; i >= 0; i--) {
                 sampled_tree = this.simulator.nextState(sampled_tree, chosen_actions[i]);
             }
-            if (sampled_tree.isEnded() !== true) {
+            if (this.simulator.isEnded(sampled_tree) !== true) {
                 node = this.expand_leaf(node, sampled_tree);
                 sampled_tree = this.simulator.nextState(sampled_tree, node.parent_action);
                 let score = this.rollout(sampled_tree);
@@ -241,16 +255,14 @@ class MCTS {
 
 function createTree() {
 
-    var tree = new SkillTree(new Map(), 50, {
-        "crits": 0,
+    var tree = new SkillTree(new Map(), 50, {"crits": 0,
         "melee": 0,
         "ranged": 0,
-        "adrenaline": 0
-    }, 0, 0, 0, 0, 0, 0);
+        "adrenaline": 0}, 0, 0, 0, 0, 0, 0);
 
     let muscleMemory = new Skill("Muscle Memory", [], 0, 5, "combat");
     tree.skills.set("Muscle Memory", muscleMemory);
-    let strengthTraining = new Skill("Strength Training", [], 0, 5,);
+    let strengthTraining = new Skill("Strength Training", [], 0, 5, );
     tree.skills.set("Strength Training", strengthTraining);
     let arrowDeflection = new Skill("Arrow Deflection", [], 0, 3, "combat");
     tree.skills.set("Arrow Deflection", arrowDeflection);
@@ -368,7 +380,7 @@ function createTree() {
     tree.skills.set("Synergy", synergy);
     let fastMetabolism = new Skill("Fast Metabolism", [], 2, 5, "alchemy");
     tree.skills.set("Fast Metabolism", fastMetabolism);
-
+    
     let sideEffects = new Skill("Side Effects", [], 3, 5, "alchemy");
     tree.skills.set("Side Effects", sideEffects);
     let hunterInstinct = new Skill("Hunter Instinct", [], 3, 5, "alchemy");
@@ -405,15 +417,20 @@ function createTree() {
     return tree;
 }
 
-exports.createTree = createTree;
-exports.MCTS = MCTS;
-exports.Simulator = Simulator;
-
-const tree = createTree();
+const mcts_tree = createTree();
+const final_tree = createTree();
 const simulator = new Simulator();
-const mcts = new MCTS(100, 2, simulator);
-mcts.rollout(tree);
-console.log(tree);
+const mcts = new MCTS(10, 2, simulator);
+let num_points = 20;
+
+for (let i=0; i < num_points; i++) {
+    let skill = mcts.think(mcts_tree);
+    console.log(skill);
+    final_tree.skills.get(skill).points += 1;
+}
+
+//http://www.rpg-gaming.com/tw3.html
+//https://www.gosunoob.com/witcher-3/skill-calculator/
 
 //http://www.rpg-gaming.com/tw3.html
 //https://www.gosunoob.com/witcher-3/skill-calculator/

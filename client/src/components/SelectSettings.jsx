@@ -1,6 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 
+import { createTree, Simulator, MCTS } from '../mcts.js';
+
 const sumValues = (obj) => {
     let total = 0;
     for (const x in obj) {
@@ -14,6 +16,13 @@ const SelectSettings = () => {
     const [pointCount, setPointCount] = useState(0);
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log("RUNNING MCTS HERE");
+
+        const tree = createTree();
+        const simulator = new Simulator();
+        const mcts = new MCTS(100, 2, simulator);
+        mcts.rollout(tree);
+        console.log(tree);
     };
 
     const calculateMaxID = (current_id) => {

@@ -14,7 +14,7 @@ class Skill {
     is_legal() {
         return this.points < this.maxPoints;
     }
-    
+
 };
 
 class MCTSNode {
@@ -28,7 +28,7 @@ class MCTSNode {
     }
 }
 
-class Simulator {
+export class Simulator {
     nextState(skill_tree, skill_name) {
         let new_tree = new SkillTree(skill_tree.skills, skill_tree.points_remaining, skill_tree.attribute_values, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row);
         new_tree.addPoint(skill_name);
@@ -140,7 +140,7 @@ class SkillTree {
     }
 };
 
-class MCTS {
+export class MCTS {
     constructor(num_nodes, explore_factor, simulator) {
         this.num_nodes = num_nodes;
         this.explore_factor = explore_factor;
@@ -182,10 +182,10 @@ class MCTS {
     // Selects random skills until points are depleted
     rollout(skill_tree) {
         //console.log(skill_tree);
-        while(this.simulator.isEnded(skill_tree) !== true) {
+        while (this.simulator.isEnded(skill_tree) !== true) {
             //instead of random we should choose a random skill with a bias towards what they want
             var legal_actions = this.simulator.legalActions(skill_tree);
-            var move_index = Math.floor(Math.random() * legal_actions.length); 
+            var move_index = Math.floor(Math.random() * legal_actions.length);
             skill_tree = this.simulator.nextState(skill_tree, legal_actions[move_index]);
         }
         return this.simulator.getScore(skill_tree);
@@ -239,16 +239,18 @@ class MCTS {
 
 }
 
-function createTree() {
+export function createTree() {
 
-    var tree = new SkillTree(new Map(), 50, {"crits": 0,
+    var tree = new SkillTree(new Map(), 50, {
+        "crits": 0,
         "melee": 0,
         "ranged": 0,
-        "adrenaline": 0}, 0, 0, 0, 0, 0, 0);
+        "adrenaline": 0
+    }, 0, 0, 0, 0, 0, 0);
 
     let muscleMemory = new Skill("Muscle Memory", [], 0, 5, "combat");
     tree.skills.set("Muscle Memory", muscleMemory);
-    let strengthTraining = new Skill("Strength Training", [], 0, 5, );
+    let strengthTraining = new Skill("Strength Training", [], 0, 5,);
     tree.skills.set("Strength Training", strengthTraining);
     let arrowDeflection = new Skill("Arrow Deflection", [], 0, 3, "combat");
     tree.skills.set("Arrow Deflection", arrowDeflection);
@@ -366,7 +368,7 @@ function createTree() {
     tree.skills.set("Synergy", synergy);
     let fastMetabolism = new Skill("Fast Metabolism", [], 2, 5, "alchemy");
     tree.skills.set("Fast Metabolism", fastMetabolism);
-    
+
     let sideEffects = new Skill("Side Effects", [], 3, 5, "alchemy");
     tree.skills.set("Side Effects", sideEffects);
     let hunterInstinct = new Skill("Hunter Instinct", [], 3, 5, "alchemy");

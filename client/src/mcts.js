@@ -35,7 +35,7 @@ class Simulator {
         this.ranged_sim = 0;
         this.adrenaline_sim = 0;
         this.defense_sim = 0;
-        this.unique_sim = .9;
+        this.unique_sim = 90;
     }
     nextState(skill_tree, skill_name) {
         let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row, skill_tree.healing_count, skill_tree.close_range_count, skill_tree.ranged_count, skill_tree.adrenaline_count, skill_tree.defense_count, skill_tree.unique_count);
@@ -65,12 +65,12 @@ class Simulator {
 
     getScore(skill_tree) {
         let total = skill_tree.healing_count + skill_tree.close_range_count + skill_tree.ranged_count + skill_tree.adrenaline_count + skill_tree.defense_count + skill_tree.unique_count;
-        let healing = skill_tree.healing_count / total;
-        let close_range = skill_tree.close_range_count / total;
-        let ranged = skill_tree.ranged_count/ total;
-        let adrenaline = skill_tree.adrenaline_count / total;
-        let defense = skill_tree.defense_count / total;
-        let unique = skill_tree.unique_count / total;
+        let healing = 100 * skill_tree.healing_count / total;
+        let close_range = 100 * skill_tree.close_range_count / total;
+        let ranged = 100 * skill_tree.ranged_count/ total;
+        let adrenaline = 100 * skill_tree.adrenaline_count / total;
+        let defense = 100 * skill_tree.defense_count / total;
+        let unique = 100 * skill_tree.unique_count / total;
         healing = Math.pow((healing - this.healing_sim), 2);
         close_range = Math.pow((close_range - this.close_range_sim), 2);
         ranged = Math.pow((ranged - this.ranged_sim), 2);
@@ -87,7 +87,7 @@ class SkillTree {
         this.points_remaining = points_remaining;
         this.combat_count = combat_count;
         this.combat_row = combat_row;
-        this.signs_count = signs_count;
+        this.signs_count = signs_count; 
         this.signs_row = signs_row;
         this.alchemy_count = alchemy_count;
         this.alchemy_row = alchemy_row;
@@ -463,9 +463,23 @@ const mcts = new MCTS(10, 2, simulator);
 let num_points = 50;
 for (let i=0; i < num_points; i++) {
     let skill = mcts.think(mcts_tree);
-    console.log(skill);
     mcts_tree = simulator.nextState(mcts_tree, skill);
 }
+console.log(mcts_tree)
+
+
+function generateSkills(desired_skills, num_points) {
+    let mcts_tree = createTree();
+    const simulator = new Simulator(desired_skills, num_points);
+    const mcts = new MCTS(10, 2, simulator);
+    for (let i=0; i < num_points; i++) {
+        let skill = mcts.think(mcts_tree);
+        mcts_tree = simulator.nextState(mcts_tree, skill);
+    }
+    return mcts_tree;
+}
+
+exports.generateSkills = generateSkills;
 
 //http://www.rpg-gaming.com/tw3.html
 //https://www.gosunoob.com/witcher-3/skill-calculator/

@@ -45,10 +45,7 @@ const SelectSettings = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("RUNNING MCTS HERE");
-
         const tree = generateSkills(value, pointCount);
-        console.log(tree.skills);
         const selected_skills = convertSkillsToRepresentation(tree.skills);
         setSelectedSkills(selected_skills);
     };

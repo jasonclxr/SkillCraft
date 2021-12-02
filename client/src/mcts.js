@@ -1,4 +1,4 @@
-const copier = require('lodash');
+import { cloneDeep } from 'lodash';
 class Skill {
     constructor(name, attribute, row, maxPoints, branch) {
         this.name = name;
@@ -35,7 +35,7 @@ class Simulator {
         this.unique_sim = desired_skills.unique ?? 90;
     }
     nextState(skill_tree, skill_name) {
-        let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row, skill_tree.healing_count, skill_tree.close_range_count, skill_tree.ranged_count, skill_tree.adrenaline_count, skill_tree.defense_count, skill_tree.unique_count);
+        let new_tree = new SkillTree(cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row, skill_tree.healing_count, skill_tree.close_range_count, skill_tree.ranged_count, skill_tree.adrenaline_count, skill_tree.defense_count, skill_tree.unique_count);
         new_tree.addPoint(skill_name);
         return new_tree;
     }
@@ -141,20 +141,28 @@ class SkillTree {
 
     addAttribute(skill_name) {
         let attr_code = this.skills.get(skill_name).attribute;
-        if (attr_code === 0) {
-            this.healing_count++;
-        } else if (attr_code === 1) {
-            this.close_range_count++;
-        } else if (attr_code === 2) {
-            this.ranged_count++;
-        } else if (attr_code === 3) {
-            this.adrenaline_count++;
-        } else if (attr_code === 4) {
-            this.defense_count++;
-        } else if (attr_code === 5) {
-            this.unique_count++;
-        } else {
-            console.error("Attribute does not exist");
+        switch (attr_code) {
+            case Attributes.HEALING:
+                this.healing_count++;
+                break;
+            case Attributes.CLOSE_RANGE:
+                this.close_range_count++;
+                break;
+            case Attributes.RANGED:
+                this.ranged_count++;
+                break;
+            case Attributes.ADRENALINE:
+                this.adrenaline_count++;
+                break;
+            case Attributes.DEFENSE:
+                this.defense_count++;
+                break;
+            case Attributes.UNIQUE:
+                this.unique_count++;
+                break;
+            default:
+                console.error("Attribute does not exist");
+                break;
         }
     }
 
@@ -294,9 +302,9 @@ class MCTS {
 }
 
 const Attributes = Object.freeze({
-    HEALING:   Symbol("Healing"),
-    CLOSE_RANGE:  Symbol("Melee"),
-    RANGED:  Symbol("Ranged"),
+    HEALING: Symbol("Healing"),
+    CLOSE_RANGE: Symbol("Melee"),
+    RANGED: Symbol("Ranged"),
     ADRENALINE: Symbol("Adrenaline"),
     DEFENSE: Symbol("Defense"),
     UNIQUE: Symbol("Unique")
@@ -306,165 +314,166 @@ function createTree(num_points = 50) {
 
     var tree = new SkillTree(new Map(), num_points, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-    let muscleMemory = new Skill("Muscle Memory", 1, 0, 5, "combat");
+    let muscleMemory = new Skill("Muscle Memory", Attributes.CLOSE_RANGE, 0, 5, "combat");
     tree.skills.set("Muscle Memory", muscleMemory);
-    let strengthTraining = new Skill("Strength Training", 1, 0, 5, "combat");
+    let strengthTraining = new Skill("Strength Training", Attributes.CLOSE_RANGE, 0, 5, "combat");
     tree.skills.set("Strength Training", strengthTraining);
-    let arrowDeflection = new Skill("Arrow Deflection", 4, 0, 3, "combat");
+    let arrowDeflection = new Skill("Arrow Deflection", Attributes.DEFENSE, 0, 3, "combat");
     tree.skills.set("Arrow Deflection", arrowDeflection);
-    let lightningReflexes = new Skill("Lightning Reflexes", 2, 0, 3, "combat");
+    let lightningReflexes = new Skill("Lightning Reflexes", Attributes.RANGED, 0, 3, "combat");
     tree.skills.set("Lightning Reflexes", lightningReflexes);
-    let resolve = new Skill("Resolve", 3, 0, 5, "combat");
+    let resolve = new Skill("Resolve", Attributes.ADRENALINE, 0, 5, "combat");
     tree.skills.set("Resolve", resolve);
 
-    let preciseBlows = new Skill("Precise Blows", 1, 1, 5, "combat");
+    let preciseBlows = new Skill("Precise Blows", Attributes.CLOSE_RANGE, 1, 5, "combat");
     tree.skills.set("Precise Blows", preciseBlows);
-    let crushingBlows = new Skill("Crushing Blows", 1, 1, 5, "combat");
+    let crushingBlows = new Skill("Crushing Blows", Attributes.CLOSE_RANGE, 1, 5, "combat");
     tree.skills.set("Crushing Blows", crushingBlows);
-    let fleetFooted = new Skill("Fleet Footed", 4, 1, 5, "combat");
+    let fleetFooted = new Skill("Fleet Footed", Attributes.DEFENSE, 1, 5, "combat");
     tree.skills.set("Fleet Footed", fleetFooted);
-    let coldBlood = new Skill("Cold Blood", 3, 1, 5, "combat");
+    let coldBlood = new Skill("Cold Blood", Attributes.ADRENALINE, 1, 5, "combat");
     tree.skills.set("Cold Blood", coldBlood);
-    let undying = new Skill("Undying", 0, 1, 5, "combat");
+    let undying = new Skill("Undying", Attributes.HEALING, 1, 5, "combat");
     tree.skills.set("Undying", undying);
 
-    let whirl = new Skill("Whirl", 1, 2, 5, "combat");
+    let whirl = new Skill("Whirl", Attributes.CLOSE_RANGE, 2, 5, "combat");
     tree.skills.set("Whirl", whirl);
-    let rend = new Skill("Crushing Blows", 1, 2, 5, "combat");
+    let rend = new Skill("Crushing Blows", Attributes.CLOSE_RANGE, 2, 5, "combat");
     tree.skills.set("Rend", rend);
-    let counterAttack = new Skill("Counter Attack", 4, 2, 3, "combat");
+    let counterAttack = new Skill("Counter Attack", Attributes.DEFENSE, 2, 3, "combat");
     tree.skills.set("Counter Attack", counterAttack);
-    let anatomicalKnowledge = new Skill("Anatomical Knowledge", 2, 2, 5, "combat");
+    let anatomicalKnowledge = new Skill("Anatomical Knowledge", Attributes.RANGED, 2, 5, "combat");
     tree.skills.set("Anatomical Knowledge", anatomicalKnowledge);
-    let razorFocus = new Skill("Razor Focus", 3, 2, 5, "combat");
+    let razorFocus = new Skill("Razor Focus", Attributes.ADRENALINE, 2, 5, "combat");
     tree.skills.set("Razor Focus", razorFocus);
 
-    let cripplingStrikes = new Skill("Crippling Strikes", 1, 3, 5, "combat");
+    let cripplingStrikes = new Skill("Crippling Strikes", Attributes.CLOSE_RANGE, 3, 5, "combat");
     tree.skills.set("Crippling Strikes", cripplingStrikes);
-    let sunderArmor = new Skill("Sunder Armor", 5, 3, 5, "combat");
+    let sunderArmor = new Skill("Sunder Armor", Attributes.UNIQUE, 3, 5, "combat");
     tree.skills.set("Sunder Armor", sunderArmor);
-    let deadlyPrecision = new Skill("Deadly Precision", 3, 3, 2, "combat");
+    let deadlyPrecision = new Skill("Deadly Precision", Attributes.ADRENALINE, 3, 2, "combat");
     tree.skills.set("Deadly Precision", deadlyPrecision);
-    let cripplingShot = new Skill("Crippling Shot", 2, 3, 5, "combat");
+    let cripplingShot = new Skill("Crippling Shot", Attributes.RANGED, 3, 5, "combat");
     tree.skills.set("Crippling Shot", cripplingShot);
-    let floodOfAnger = new Skill("Flood of Anger", 3, 3, 5, "combat");
+    let floodOfAnger = new Skill("Flood of Anger", Attributes.ADRENALINE, 3, 5, "combat");
     tree.skills.set("Flood of Anger", floodOfAnger);
 
-    let farReachingAard = new Skill("Far Reaching Aard", 4, 0, 3, "signs");
+    let farReachingAard = new Skill("Far Reaching Aard", Attributes.DEFENSE, 0, 3, "signs");
     tree.skills.set("Far Reaching Aard", farReachingAard);
-    let meltArmor = new Skill("Strength Training", 1, 0, 5, "signs");
+    let meltArmor = new Skill("Strength Training", Attributes.CLOSE_RANGE, 0, 5, "signs");
     tree.skills.set("Melt Armor", meltArmor);
-    let sustainedGlyphs = new Skill("Sustained Glyphs", 5, 0, 2, "signs");
+    let sustainedGlyphs = new Skill("Sustained Glyphs", Attributes.UNIQUE, 0, 2, "signs");
     tree.skills.set("Sustained Glyphs", sustainedGlyphs);
-    let explodingShield = new Skill("Exploding Shield", 4, 0, 3, "signs");
+    let explodingShield = new Skill("Exploding Shield", Attributes.DEFENSE, 0, 3, "signs");
     tree.skills.set("Exploding Shield", explodingShield);
-    let delusion = new Skill("Delusion", 5, 0, 3, "signs");
+    let delusion = new Skill("Delusion", Attributes.UNIQUE, 0, 3, "signs");
     tree.skills.set("Delusion", delusion);
 
-    let aardSweep = new Skill("Aard Sweep", 4, 1, 3, "signs");
+    let aardSweep = new Skill("Aard Sweep", Attributes.DEFENSE, 1, 3, "signs");
     tree.skills.set("Aard Sweep", aardSweep);
-    let firestream = new Skill("Firestream", 1, 1, 3, "signs");
+    let firestream = new Skill("Firestream", Attributes.CLOSE_RANGE, 1, 3, "signs");
     tree.skills.set("Firestream", firestream);
-    let magicTrap = new Skill("Magic Trap", 5, 1, 3, "signs");
+    let magicTrap = new Skill("Magic Trap", Attributes.UNIQUE, 1, 3, "signs");
     tree.skills.set("Magic Trap", magicTrap);
-    let activeShield = new Skill("Active Shield", 4, 1, 3, "signs");
+    let activeShield = new Skill("Active Shield", Attributes.DEFENSE, 1, 3, "signs");
     tree.skills.set("Active Shield", activeShield);
-    let puppet = new Skill("Puppet", 5, 1, 3, "signs");
+    let puppet = new Skill("Puppet", Attributes.UNIQUE, 1, 3, "signs");
     tree.skills.set("Puppet", puppet);
 
-    let aardIntensity = new Skill("Aard Intensity", 4, 2, 5, "signs");
+    let aardIntensity = new Skill("Aard Intensity", Attributes.DEFENSE, 2, 5, "signs");
     tree.skills.set("Aard Intensity", aardIntensity);
-    let igniIntensity = new Skill("Igni Intensity", 1, 2, 5, "signs");
+    let igniIntensity = new Skill("Igni Intensity", Attributes.CLOSE_RANGE, 2, 5, "signs");
     tree.skills.set("Igni Intensity", igniIntensity);
-    let yrdenIntensity = new Skill("Yrden Intensity", 5, 2, 5, "signs");
+    let yrdenIntensity = new Skill("Yrden Intensity", Attributes.UNIQUE, 2, 5, "signs");
     tree.skills.set("Yrden Intensity", yrdenIntensity);
-    let quenIntensity = new Skill("Quen Intensity", 4, 2, 5, "signs");
+    let quenIntensity = new Skill("Quen Intensity", Attributes.DEFENSE, 2, 5, "signs");
     tree.skills.set("Quen Intensity", quenIntensity);
-    let axiiIntensity = new Skill("Razor Focus", 5, 2, 5, "signs");
+    let axiiIntensity = new Skill("Razor Focus", Attributes.UNIQUE, 2, 5, "signs");
     tree.skills.set("Axii Intensity", axiiIntensity);
 
-    let shockWave = new Skill("Shock Wave", 4, 3, 5, "signs");
+    let shockWave = new Skill("Shock Wave", Attributes.DEFENSE, 3, 5, "signs");
     tree.skills.set("Shock Wave", shockWave);
-    let pyromanica = new Skill("Pyromanica", 1, 3, 5, "signs");
+    let pyromanica = new Skill("Pyromanica", Attributes.CLOSE_RANGE, 3, 5, "signs");
     tree.skills.set("Pyromanica", pyromanica);
-    let superchargedGlyphs = new Skill("Supercharged Glyphs", 5, 3, 5, "signs");
+    let superchargedGlyphs = new Skill("Supercharged Glyphs", Attributes.UNIQUE, 3, 5, "signs");
     tree.skills.set("Supercharged Glyphs", superchargedGlyphs);
-    let quenDischarge = new Skill("Quen Discharge", 4, 3, 5, "signs");
+    let quenDischarge = new Skill("Quen Discharge", Attributes.DEFENSE, 3, 5, "signs");
     tree.skills.set("Quen Discharge", quenDischarge);
-    let domination = new Skill("Domination", 5, 3, 3, "signs");
+    let domination = new Skill("Domination", Attributes.UNIQUE, 3, 3, "signs");
     tree.skills.set("Domination", domination);
 
-    let heightenedTolerance = new Skill("Heightened Tolerance", 0, 0, 5, "alchemy");
+    let heightenedTolerance = new Skill("Heightened Tolerance", Attributes.HEALING, 0, 5, "alchemy");
     tree.skills.set("Heightened Tolerance", heightenedTolerance);
-    let poisonedBlades = new Skill("Poisoned Blades", 1, 0, 5, "alchemy");
+    let poisonedBlades = new Skill("Poisoned Blades", Attributes.CLOSE_RANGE, 0, 5, "alchemy");
     tree.skills.set("Poisoned Blades", poisonedBlades);
-    let steadyAim = new Skill("Steady Aim", 2, 0, 3, "alchemy");
+    let steadyAim = new Skill("Steady Aim", Attributes.RANGED, 0, 3, "alchemy");
     tree.skills.set("Steady Aim", steadyAim);
-    let acquiredTolerance = new Skill("Acquired Tolerance", 5, 0, 3, "alchemy");
+    let acquiredTolerance = new Skill("Acquired Tolerance", Attributes.UNIQUE, 0, 3, "alchemy");
     tree.skills.set("Acquired Tolerance", acquiredTolerance);
-    let frenzy = new Skill("Frenzy", 4, 0, 3, "alchemy");
+    let frenzy = new Skill("Frenzy", Attributes.DEFENSE, 0, 3, "alchemy");
     tree.skills.set("Frenzy", frenzy);
 
-    let refreshment = new Skill("Refreshment", 0, 1, 5, "alchemy");
+    let refreshment = new Skill("Refreshment", Attributes.HEALING, 1, 5, "alchemy");
     tree.skills.set("Refreshment", refreshment);
-    let protectiveCoating = new Skill("Protective Coating", 4, 1, 5, "alchemy");
+    let protectiveCoating = new Skill("Protective Coating", Attributes.DEFENSE, 1, 5, "alchemy");
     tree.skills.set("Protective Coating", protectiveCoating);
-    let pyrotechnics = new Skill("Pyrotechnics", 2, 1, 5, "alchemy");
+    let pyrotechnics = new Skill("Pyrotechnics", Attributes.RANGED, 1, 5, "alchemy");
     tree.skills.set("Pyrotechnics", pyrotechnics);
-    let tissueTransmutation = new Skill("Tissue Transmutation", 0, 1, 5, "alchemy");
+    let tissueTransmutation = new Skill("Tissue Transmutation", Attributes.HEALING, 1, 5, "alchemy");
     tree.skills.set("Tissue Transmutation", tissueTransmutation);
-    let endurePain = new Skill("Endure Pain", 0, 1, 5, "alchemy");
+    let endurePain = new Skill("Endure Pain", Attributes.HEALING, 1, 5, "alchemy");
     tree.skills.set("Endure Pain", endurePain);
 
-    let delayedRecovery = new Skill("Delayed Recovery", 5, 2, 3, "alchemy");
+    let delayedRecovery = new Skill("Delayed Recovery", Attributes.UNIQUE, 2, 3, "alchemy");
     tree.skills.set("Delayed Recovery", delayedRecovery);
-    let fixative = new Skill("Fixative", 1, 2, 3, "alchemy");
+    let fixative = new Skill("Fixative", Attributes.CLOSE_RANGE, 2, 3, "alchemy");
     tree.skills.set("Fixative", fixative);
-    let efficiency = new Skill("Efficiency", 2, 2, 5, "alchemy");
+    let efficiency = new Skill("Efficiency", Attributes.RANGED, 2, 5, "alchemy");
     tree.skills.set("Efficiency", efficiency);
-    let synergy = new Skill("Synergy", 5, 2, 5, "alchemy");
+    let synergy = new Skill("Synergy", Attributes.UNIQUE, 2, 5, "alchemy");
     tree.skills.set("Synergy", synergy);
-    let fastMetabolism = new Skill("Fast Metabolism", 5, 2, 5, "alchemy");
+    let fastMetabolism = new Skill("Fast Metabolism", Attributes.UNIQUE, 2, 5, "alchemy");
     tree.skills.set("Fast Metabolism", fastMetabolism);
 
-    let sideEffects = new Skill("Side Effects", 0, 3, 5, "alchemy");
+    let sideEffects = new Skill("Side Effects", Attributes.HEALING, 3, 5, "alchemy");
     tree.skills.set("Side Effects", sideEffects);
-    let hunterInstinct = new Skill("Hunter Instinct", 3, 3, 5, "alchemy");
+    let hunterInstinct = new Skill("Hunter Instinct", Attributes.ADRENALINE, 3, 5, "alchemy");
     tree.skills.set("Hunter Instinct", hunterInstinct);
-    let clusterBombs = new Skill("Cluster Bombs", 2, 3, 5, "alchemy");
+    let clusterBombs = new Skill("Cluster Bombs", Attributes.RANGED, 3, 5, "alchemy");
     tree.skills.set("Cluster Bombs", clusterBombs);
-    let adaption = new Skill("Adaption", 5, 3, 5, "alchemy");
+    let adaption = new Skill("Adaption", Attributes.UNIQUE, 3, 5, "alchemy");
     tree.skills.set("Adaption", adaption);
-    let killingSpree = new Skill("Killing Spree", 1, 3, 5, "alchemy");
+    let killingSpree = new Skill("Killing Spree", Attributes.CLOSE_RANGE, 3, 5, "alchemy");
     tree.skills.set("Killing Spree", killingSpree);
 
-    let sunAndStars = new Skill("Sun and Stars", 0, 0, 1, "general");
+    let sunAndStars = new Skill("Sun and Stars", Attributes.HEALING, 0, 1, "general");
     tree.skills.set("Sun and Stars", sunAndStars);
-    let survivalInstinct = new Skill("Surival Instinct", 0, 0, 1, "general");
+    let survivalInstinct = new Skill("Surival Instinct", Attributes.HEALING, 0, 1, "general");
     tree.skills.set("Survival Instinct", survivalInstinct);
-    let catSchoolTechniques = new Skill("Cat School Techniques", 1, 0, 1, "general");
+    let catSchoolTechniques = new Skill("Cat School Techniques", Attributes.CLOSE_RANGE, 0, 1, "general");
     tree.skills.set("Cat School Techniques", catSchoolTechniques);
-    let griffinSchoolTechniques = new Skill("Griffin School Techniques", 4, 0, 1, "general");
+    let griffinSchoolTechniques = new Skill("Griffin School Techniques", Attributes.DEFENSE, 0, 1, "general");
     tree.skills.set("Griffin School Techniques", griffinSchoolTechniques);
-    let bearSchoolTechniques = new Skill("Bear School Techniques", 4, 0, 1, "general");
+    let bearSchoolTechniques = new Skill("Bear School Techniques", Attributes.DEFENSE, 0, 1, "general");
     tree.skills.set("Bear School Techniques", bearSchoolTechniques);
 
-    let steadyShot = new Skill("Steady Shot", 2, 0, 1, "general");
+    let steadyShot = new Skill("Steady Shot", Attributes.RANGED, 0, 1, "general");
     tree.skills.set("Steady Shot", steadyShot);
-    let rageManagement = new Skill("Rage Management", 3, 0, 1, "general");
+    let rageManagement = new Skill("Rage Management", Attributes.ADRENALINE, 0, 1, "general");
     tree.skills.set("Rage Management", rageManagement);
-    let focusGen = new Skill("Focus", 3, 0, 1, "general");
+    let focusGen = new Skill("Focus", Attributes.ADRENALINE, 0, 1, "general");
     tree.skills.set("Focus", focusGen);
-    let adrenalineBurst = new Skill("Adrenaline Burst", 3, 0, 1, "general");
+    let adrenalineBurst = new Skill("Adrenaline Burst", Attributes.ADRENALINE, 0, 1, "general");
     tree.skills.set("Adrenaline Burst", adrenalineBurst);
-    let metabolismControl = new Skill("Metabolism Control", 5, 0, 1, "general");
+    let metabolismControl = new Skill("Metabolism Control", Attributes.UNIQUE, 0, 1, "general");
     tree.skills.set("Metabolism Control", metabolismControl);
 
     return tree;
 }
 
-function generateSkills(desired_skills, num_points) {
-    let mcts_tree = createTree(num_points);
+function generateSkills(desired_skills, num_points, mcts_tree = null) {
+    mcts_tree = mcts_tree ?? createTree(num_points);
+    mcts_tree.points_remaining = num_points;
     const simulator = new Simulator(desired_skills);
     const mcts = new MCTS(10, 2, simulator);
     for (let i = 0; i < num_points; i++) {
@@ -474,7 +483,10 @@ function generateSkills(desired_skills, num_points) {
     return mcts_tree;
 }
 
-exports.generateSkills = generateSkills;
+const _generateSkills = generateSkills;
+export { _generateSkills as generateSkills };
+const _createTree = createTree;
+export { _createTree as createTree };
 
 //http://www.rpg-gaming.com/tw3.html
 //https://www.gosunoob.com/witcher-3/skill-calculator/

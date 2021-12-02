@@ -1,6 +1,3 @@
-// Note: might want to consider max win rates of children nodes
-
-// skill == action
 const copier = require('lodash');
 class Skill {
     constructor(name, attribute, row, maxPoints, branch) {
@@ -200,15 +197,15 @@ class MCTS {
         let current_node = node;
         let max_uct_node = current_node;
         while (current_node.untried_skills.length > 0 && current_node.child_nodes.size > 0) {
-            let max_uct = Infinity;
+            let max_uct = -Infinity;
             for (let child_node of current_node.child_nodes.values()) {
-                let uct = Infinity;
+                let uct = -Infinity;
                 if (node.parent === null) {
-                    uct = child_node.score / child_node.visits;
+                    uct = 1 - child_node.score / child_node.visits;
                 } else {
-                    uct = child_node.score / child_node.visits - this.explore_factor * Math.sqrt(Math.log(child_node.parent.visits) / child_node.visits);
+                    uct = (1 - (child_node.score / child_node.visits)) + this.explore_factor * 2 * Math.sqrt(Math.log(child_node.parent.visits) / child_node.visits);
                 }
-                if (uct < max_uct) {
+                if (uct > max_uct) {
                     max_uct = uct;
                     max_uct_node = child_node;
                 }
@@ -263,7 +260,7 @@ class MCTS {
         let root_node = new MCTSNode(null, null, this.simulator.legalActions(skill_tree));
         let sampled_tree = skill_tree;
         let node = root_node;
-        for (let step = 0; step < 10; step++) {
+        for (let step = 0; step < 500; step++) {
             sampled_tree = skill_tree;
             node = root_node;
             node = this.traverse_nodes(node);
@@ -295,6 +292,15 @@ class MCTS {
     }
 
 }
+
+const Attributes = Object.freeze({
+    HEALING:   Symbol("Healing"),
+    CLOSE_RANGE:  Symbol("Melee"),
+    RANGED:  Symbol("Ranged"),
+    ADRENALINE: Symbol("Adrenaline"),
+    DEFENSE: Symbol("Defense"),
+    UNIQUE: Symbol("Unique")
+});
 
 function createTree(num_points = 50) {
 
@@ -456,17 +462,6 @@ function createTree(num_points = 50) {
 
     return tree;
 }
-
-let mcts_tree = createTree();
-const simulator = new Simulator();
-const mcts = new MCTS(10, 2, simulator);
-let num_points = 50;
-for (let i = 0; i < num_points; i++) {
-    let skill = mcts.think(mcts_tree);
-    mcts_tree = simulator.nextState(mcts_tree, skill);
-}
-console.log(mcts_tree);
-
 
 function generateSkills(desired_skills, num_points) {
     let mcts_tree = createTree(num_points);

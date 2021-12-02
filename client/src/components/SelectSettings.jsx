@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
-import { Form, Button, Col, Row } from 'react-bootstrap';
+import React, { useContext, useState, useEffect } from 'react';
+import { Form, Button, Spinner, Col, Row } from 'react-bootstrap';
 
-import { generateSkills } from '../mcts.js';
+import { generateSkills, createTree } from '../mcts.js';
 import { AppContext } from '../context/AppContext';
 import { capitalize } from 'lodash';
 
@@ -37,17 +37,31 @@ const convertSkillsToRepresentation = (skills) => {
 
 const SelectSettings = () => {
     const [value, setValue] = useState({ healing: 16, close_range: 16, ranged: 16, adrenaline: 16, defense: 16, unique: 16 });
+    const [startTree, setTree] = useState(() => {
+        const initialTree = createTree();
+        return initialTree;
+    });
     const [pointCount, setPointCount] = useState(0);
+    const [isLoading, setLoading] = useState(false);
 
     const { setSelectedSkills } = useContext(AppContext);
 
+    useEffect(() => {
+        if (isLoading) {
+            console.log(startTree);
+            const tree = generateSkills(value, pointCount, startTree);
+            const selected_skills = convertSkillsToRepresentation(tree.skills);
+            setSelectedSkills(selected_skills);
+            setLoading(false);
+        }
+    }, [isLoading, pointCount, setSelectedSkills, startTree, value.healing, value.close_range, value.ranged, value.adrenaline, value.defense, value.unique]);
+
+
     const MAX_SKILLS = 96;
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        const tree = generateSkills(value, pointCount);
-        const selected_skills = convertSkillsToRepresentation(tree.skills);
-        setSelectedSkills(selected_skills);
+        setLoading(true);
     };
 
     const calculateMaxID = (current_id) => {
@@ -96,7 +110,19 @@ const SelectSettings = () => {
 
             <Form.Group as={Row} className="mb-3">
                 <Col>
-                    <Button type="submit" onClick={e => handleSubmit(e)}>Compute</Button>
+                    <Button type="submit" onClick={!isLoading ? e => handleSubmit(e) : null} disabled={isLoading}>
+
+                        {isLoading ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
+                        ) : null}
+                        {isLoading ? ' Loading…' : 'Compute'}
+                    </Button>
                 </Col>
             </Form.Group>
         </Form>

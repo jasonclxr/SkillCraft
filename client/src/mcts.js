@@ -18,43 +18,27 @@ class Skill {
 };
 
 class MCTSNode {
-    constructor(parent, parent_action, untried_skills, healing_count, close_range_count, ranged_count, adrenaline_count, defense_count, unique_count) {
+    constructor(parent, parent_action, untried_skills) {
         this.parent = parent;
         this.parent_action = parent_action;
         this.untried_skills = untried_skills;
-        this.healing_count = healing_count;
-        this.close_range_count = close_range_count;
-        this.ranged_count = ranged_count;
-        this.adrenaline_count = adrenaline_count;
-        this.defense_count = defense_count;
-        this.unique_count = unique_count;
         this.child_nodes = new Map();
         this.visits = 0;
         this.score = 0;
     }
-
-    incrementAttribute(attr_code) {
-        if (attr_code === 0) {
-            this.healing_count++;
-        } else if (attr_code === 1) {
-            this.close_range_count++;
-        } else if (attr_code === 2) {
-            this.ranged_count++;
-        } else if (attr_code === 3) {
-            this.adrenaline_count++;
-        } else if (attr_code === 4) {
-            this.defense_count++;
-        } else if (attr_code === 5) {
-            this.unique_count++;
-        } else {
-            console.error("Attribute does not exist");
-        }
-    }
 }
 
 class Simulator {
+    constructor() {
+        this.healing_sim = 0;
+        this.close_range_sim = 0;
+        this.ranged_sim = 0;
+        this.adrenaline_sim = 0;
+        this.defense_sim = 0;
+        this.unique_sim = 90;
+    }
     nextState(skill_tree, skill_name) {
-        let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row);
+        let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row, skill_tree.healing_count, skill_tree.close_range_count, skill_tree.ranged_count, skill_tree.adrenaline_count, skill_tree.defense_count, skill_tree.unique_count);
         new_tree.addPoint(skill_name);
         return new_tree;
     }
@@ -80,20 +64,39 @@ class Simulator {
     }
 
     getScore(skill_tree) {
-        return 1;
+        let total = skill_tree.healing_count + skill_tree.close_range_count + skill_tree.ranged_count + skill_tree.adrenaline_count + skill_tree.defense_count + skill_tree.unique_count;
+        let healing = 100 * skill_tree.healing_count / total;
+        let close_range = 100 * skill_tree.close_range_count / total;
+        let ranged = 100 * skill_tree.ranged_count/ total;
+        let adrenaline = 100 * skill_tree.adrenaline_count / total;
+        let defense = 100 * skill_tree.defense_count / total;
+        let unique = 100 * skill_tree.unique_count / total;
+        healing = Math.pow((healing - this.healing_sim), 2);
+        close_range = Math.pow((close_range - this.close_range_sim), 2);
+        ranged = Math.pow((ranged - this.ranged_sim), 2);
+        adrenaline = Math.pow((adrenaline - this.adrenaline_sim), 2);
+        defense = Math.pow((defense - this.defense_sim), 2);
+        unique = Math.pow((unique - this.unique_sim), 2);
+        return Math.pow((healing + close_range + ranged + adrenaline + defense + unique), 0.5);
     }
 }
 
 class SkillTree {
-    constructor(skills, points_remaining, combat_count, combat_row, signs_count, signs_row, alchemy_count, alchemy_row) {
+    constructor(skills, points_remaining, combat_count, combat_row, signs_count, signs_row, alchemy_count, alchemy_row, healing_count, close_range_count, ranged_count, adrenaline_count, defense_count, unique_count) {
         this.skills = skills;
         this.points_remaining = points_remaining;
         this.combat_count = combat_count;
         this.combat_row = combat_row;
-        this.signs_count = signs_count;
+        this.signs_count = signs_count; 
         this.signs_row = signs_row;
         this.alchemy_count = alchemy_count;
         this.alchemy_row = alchemy_row;
+        this.healing_count = healing_count;
+        this.close_range_count = close_range_count;
+        this.ranged_count = ranged_count;
+        this.adrenaline_count = adrenaline_count;
+        this.defense_count = defense_count;
+        this.unique_count = unique_count;
     }
 
     addPoint(skill_name) {
@@ -135,6 +138,26 @@ class SkillTree {
                 }
             }
             this.points_remaining -= 1;
+            this.addAttribute(skill_name);
+        }
+    }
+
+    addAttribute(skill_name) {
+        let attr_code = this.skills.get(skill_name).attribute;
+        if (attr_code === 0) {
+            this.healing_count++;
+        } else if (attr_code === 1) {
+            this.close_range_count++;
+        } else if (attr_code === 2) {
+            this.ranged_count++;
+        } else if (attr_code === 3) {
+            this.adrenaline_count++;
+        } else if (attr_code === 4) {
+            this.defense_count++;
+        } else if (attr_code === 5) {
+            this.unique_count++;
+        } else {
+            console.error("Attribute does not exist");
         }
     }
 
@@ -177,15 +200,15 @@ class MCTS {
         let current_node = node;
         let max_uct_node = current_node;
         while (current_node.untried_skills.length > 0 && current_node.child_nodes.size > 0) {
-            let max_uct = -1;
+            let max_uct = Infinity;
             for (let child_node of current_node.child_nodes.values()) {
-                let uct = -1;
+                let uct = Infinity;
                 if (node.parent === null) {
                     uct = child_node.score / child_node.visits;
                 } else {
-                    uct = child_node.score / child_node.visits + this.explore_factor * Math.sqrt(Math.log(child_node.parent.visits) / child_node.visits);
+                    uct = child_node.score / child_node.visits - this.explore_factor * Math.sqrt(Math.log(child_node.parent.visits) / child_node.visits);
                 }
-                if (uct > max_uct) {
+                if (uct < max_uct) {
                     max_uct = uct;
                     max_uct_node = child_node;
                 }
@@ -201,11 +224,9 @@ class MCTS {
         if (node.untried_skills.length > 0) {
             let move_index = Math.floor(Math.random() * node.untried_skills.length);
             let new_action = node.untried_skills[move_index];
-            let skill_attribute = skill_tree.skills.get(new_action).attribute;
             skill_tree = this.simulator.nextState(skill_tree, new_action);
             //add logic for incrementing attributes count
-            new_node = new MCTSNode(node, new_action, this.simulator.legalActions(skill_tree), node.healing_count, node.close_range_count, node.ranged_count, node.adrenaline_count, node.defense_count, node.unique_count);
-            new_node.incrementAttribute(skill_attribute);
+            new_node = new MCTSNode(node, new_action, this.simulator.legalActions(skill_tree));
             if (skill_tree.skills.get(node.untried_skills[move_index]).is_legal() === false) {
                 node.untried_skills.splice(move_index, 1);
             }     
@@ -239,7 +260,7 @@ class MCTS {
 
     // Performs MCTS by sampling games and returns the action
     think(skill_tree) {
-        let root_node = new MCTSNode(null, null, this.simulator.legalActions(skill_tree), 0, 0, 0, 0, 0, 0);
+        let root_node = new MCTSNode(null, null, this.simulator.legalActions(skill_tree));
         let sampled_tree = skill_tree;
         let node = root_node;
         for (let step = 0; step < 10; step++) {
@@ -277,7 +298,7 @@ class MCTS {
 
 function createTree() {
 
-    var tree = new SkillTree(new Map(), 50, 0, 0, 0, 0, 0, 0)
+    var tree = new SkillTree(new Map(), 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     let muscleMemory = new Skill("Muscle Memory", 1, 0, 5, "combat");
     tree.skills.set("Muscle Memory", muscleMemory);
@@ -444,7 +465,21 @@ for (let i=0; i < num_points; i++) {
     let skill = mcts.think(mcts_tree);
     mcts_tree = simulator.nextState(mcts_tree, skill);
 }
-console.log(mcts_tree);
+console.log(mcts_tree)
+
+
+function generateSkills(desired_skills, num_points) {
+    let mcts_tree = createTree();
+    const simulator = new Simulator(desired_skills, num_points);
+    const mcts = new MCTS(10, 2, simulator);
+    for (let i=0; i < num_points; i++) {
+        let skill = mcts.think(mcts_tree);
+        mcts_tree = simulator.nextState(mcts_tree, skill);
+    }
+    return mcts_tree;
+}
+
+exports.generateSkills = generateSkills;
 
 //http://www.rpg-gaming.com/tw3.html
 //https://www.gosunoob.com/witcher-3/skill-calculator/

@@ -4,11 +4,10 @@ export const AppContext = createContext();
 
 export const AppContextProvider = props => {
 
-    const [] = useState([]);
-    const [] = useState(null);
+    const [selectedSkills, setSelectedSkills] = useState({ combat: [], sign: [], alchemy: [], general: [] });
 
     return (
-        <AppContext.Provider value={{}}>
+        <AppContext.Provider value={{ selectedSkills, setSelectedSkills }}>
             {props.children}
         </AppContext.Provider>
     );

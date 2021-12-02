@@ -1,15 +1,14 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import SelectSettings from '../components/SelectSettings';
+import { AppContext } from '../context/AppContext';
 import Header from '../components/Header';
 import { Row, Col, ListGroup } from 'react-bootstrap';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
+import { capitalize } from 'lodash';
 
 const Home = () => {
-    let combatSkills = ["Muscle Memory (1/5)", "Muscle Memory (1/5)", "Muscle Memory (1/5)"];
-    let signSkills = ["Far-Reaching Aard (1/5)", "Far-Reaching Aard (1/5)"];
-    let alchemySkills = ["Refreshment", "Refreshment", "Refreshment"];
-    let generalSkills = ["Sun and Stars", "Sun and Stars", "Sun and Stars"];
+    const { selectedSkills } = useContext(AppContext);
 
     return (
         <div>
@@ -21,38 +20,18 @@ const Home = () => {
 
                 <Col sm={7}>
                     <Tabs defaultActiveKey="combat" className="mb-3">
-                        <Tab eventKey="combat" title="Combat Skills">
-                            <ListGroup>
-                                {combatSkills.map((skills, i) => {
-                                    return <ListGroup.Item>Row {i + 1}: {skills}</ListGroup.Item>;
-                                })}
-                            </ListGroup>
-                        </Tab>
-                        <Tab eventKey="signs" title="Signs">
-                            <ListGroup>
-                                {signSkills.map((skills, i) => {
-                                    return <ListGroup.Item>Row {i + 1}: {skills}</ListGroup.Item>;
-                                })}
-                            </ListGroup>
-                        </Tab>
-                        <Tab eventKey="alchemy" title="Alchemy Skills">
-                            <ListGroup>
-                                {alchemySkills.map((skills, i) => {
-                                    return <ListGroup.Item>Row {i + 1}: {skills}</ListGroup.Item>;
-                                })}
-                            </ListGroup>
-                        </Tab>
-                        <Tab eventKey="general" title="General Skills">
-                            <ListGroup>
-                                {generalSkills.map((skills, i) => {
-                                    return <ListGroup.Item>Row {i + 1}: {skills}</ListGroup.Item>;
-                                })}
-                            </ListGroup>
-                        </Tab>
+                        {selectedSkills && Object.keys(selectedSkills).map((key, index) => {
+                            return (<Tab eventKey={key} title={capitalize(key) + " Skills"} key={index}>
+                                <ListGroup>
+                                    {selectedSkills[key].map((skills, i) => {
+                                        return <ListGroup.Item key={i}>Row {skills.row + 1}: {skills.name} ({skills.points} / {skills.maxPoints})</ListGroup.Item>;
+                                    })}
+                                </ListGroup>
+                            </Tab>);
+                        })}
                     </Tabs>
                 </Col>
             </Row>
-
         </div>
     )
 };

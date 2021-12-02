@@ -1,28 +1,56 @@
 import React, { useContext, useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 
-import { createTree, Simulator, MCTS } from '../mcts.js';
+import { generateSkills } from '../mcts.js';
+import { AppContext } from '../context/AppContext';
+import { capitalize } from 'lodash';
 
-const sumValues = (obj) => {
-    let total = 0;
-    for (const x in obj) {
-        total += obj[x];
+
+const convertSkillsToRepresentation = (skills) => {
+    let combats = [];
+    let signs = [];
+    let alchemy = [];
+    let generals = [];
+    for (let [, value] of skills) {
+        if (value.points === 0)
+            continue;
+        switch (value.branch) {
+            case "combat":
+                combats.push(value);
+                break;
+            case "signs":
+                signs.push(value);
+                break;
+            case "alchemy":
+                alchemy.push(value);
+                break;
+            case "general":
+                generals.push(value);
+                break;
+            default:
+                console.log("WHATS THIS", value);
+                break;
+        }
     }
-    return total;
+    return { combat: combats, sign: signs, alchemy: alchemy, general: generals };
 }
 
 const SelectSettings = () => {
-    const [value, setValue] = useState({ agility: 20, stealth: 20, survivability: 20, magic: 20, signs: 20 });
+    const [value, setValue] = useState({ healing: 16, close_range: 16, ranged: 16, adrenaline: 16, defense: 16, unique: 16 });
     const [pointCount, setPointCount] = useState(0);
+
+    const { setSelectedSkills } = useContext(AppContext);
+
+    const MAX_SKILLS = 96;
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("RUNNING MCTS HERE");
 
-        const tree = createTree();
-        const simulator = new Simulator();
-        const mcts = new MCTS(100, 2, simulator);
-        mcts.rollout(tree);
-        console.log(tree);
+        const tree = generateSkills(value, pointCount);
+        console.log(tree.skills);
+        const selected_skills = convertSkillsToRepresentation(tree.skills);
+        setSelectedSkills(selected_skills);
     };
 
     const calculateMaxID = (current_id) => {
@@ -58,10 +86,10 @@ const SelectSettings = () => {
                 return (
                     <Form.Group as={Row} className="mb-3" key={index}>
                         <Form.Label column sm={2}>
-                            {key}
+                            {capitalize(key)}
                         </Form.Label>
                         <Col>
-                            <Form.Range value={value[key]} onChange={e => calculateSliders(e, key)} min={0} max={100} />
+                            <Form.Range value={value[key]} onChange={e => calculateSliders(e, key)} min={0} max={MAX_SKILLS} />
                         </Col>
                         <Col>
                             {value[key]}
@@ -71,7 +99,7 @@ const SelectSettings = () => {
 
             <Form.Group as={Row} className="mb-3">
                 <Col>
-                    <Button type="submit" onClick={e => handleSubmit(e)}>Sign in</Button>
+                    <Button type="submit" onClick={e => handleSubmit(e)}>Compute</Button>
                 </Col>
             </Form.Group>
         </Form>

@@ -33,11 +33,24 @@ class Simulator {
         this.adrenaline_sim = desired_skills.adrenaline ?? 0;
         this.defense_sim = desired_skills.defense ?? 0;
         this.unique_sim = desired_skills.unique ?? 90;
+        
+        this.cared_about = [];
+        this.caredAboutTraits();
+        console.log(this.cared_about);
     }
     nextState(skill_tree, skill_name) {
         let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row, skill_tree.healing_count, skill_tree.close_range_count, skill_tree.ranged_count, skill_tree.adrenaline_count, skill_tree.defense_count, skill_tree.unique_count);
         new_tree.addPoint(skill_name);
         return new_tree;
+    }
+
+    caredAboutTraits() {
+        if(this.healing_sim > 0) this.cared_about.push("Healing");
+        if(this.close_range_sim > 0) this.cared_about.push("Melee");
+        if(this.ranged_sim > 0) this.cared_about.push("Ranged");
+        if(this.adrenaline_sim > 0) this.cared_about.push("Adrenaline");
+        if(this.defense_sim > 0) this.cared_about.push("Defense");
+        if(this.unique_sim > 0) this.cared_about.push("Unique");
     }
 
     legalActions(skill_tree) {
@@ -245,7 +258,12 @@ class MCTS {
         while (this.simulator.isEnded(skill_tree) !== true) {
             var legal_actions = this.simulator.legalActions(skill_tree);
             var move_index = Math.floor(Math.random() * legal_actions.length);
-            skill_tree = this.simulator.nextState(skill_tree, legal_actions[move_index]);
+            var curr_skill_name = legal_actions[move_index];
+            // 1st heuristic: if we find a general skill that has a trait we are not looking for, completely ignore
+            var curr_skill_attr = skill_tree.skills.get(curr_skill_name).attribute.description;
+            var curr_skill_branch = skill_tree.skills.get(curr_skill_name).branch;
+            if(curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) continue;
+            skill_tree = this.simulator.nextState(skill_tree, curr_skill_name);
         }
         return this.simulator.getScore(skill_tree);
     }

@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+const copier = require('lodash');
 class Skill {
     constructor(name, attribute, row, maxPoints, branch) {
         this.name = name;
@@ -35,7 +35,7 @@ class Simulator {
         this.unique_sim = desired_skills.unique ?? 90;
     }
     nextState(skill_tree, skill_name) {
-        let new_tree = new SkillTree(cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row, skill_tree.healing_count, skill_tree.close_range_count, skill_tree.ranged_count, skill_tree.adrenaline_count, skill_tree.defense_count, skill_tree.unique_count);
+        let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row, skill_tree.healing_count, skill_tree.close_range_count, skill_tree.ranged_count, skill_tree.adrenaline_count, skill_tree.defense_count, skill_tree.unique_count);
         new_tree.addPoint(skill_name);
         return new_tree;
     }
@@ -483,10 +483,8 @@ function generateSkills(desired_skills, num_points, mcts_tree = null) {
     return mcts_tree;
 }
 
-const _generateSkills = generateSkills;
-export { _generateSkills as generateSkills };
-const _createTree = createTree;
-export { _createTree as createTree };
+exports.generateSkills = generateSkills;
+exports.createTree = createTree;
 
 //http://www.rpg-gaming.com/tw3.html
 //https://www.gosunoob.com/witcher-3/skill-calculator/

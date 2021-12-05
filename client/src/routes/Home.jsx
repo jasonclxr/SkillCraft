@@ -1,16 +1,23 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import SelectSettings from '../components/SelectSettings';
-import {AppContext} from '../context/AppContext';
+import { AppContext } from '../context/AppContext';
 import Header from '../components/Header';
-import {Row, Col, ListGroup} from 'react-bootstrap';
+import { Row, Col, ListGroup } from 'react-bootstrap';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
-import {capitalize} from 'lodash';
+import { capitalize } from 'lodash';
+import Sprite from '../components/Sprite';
+
+import customData from '../imgs/skills-spritesheet.json';
 
 const Home = () => {
     const { selectedSkills } = useContext(AppContext);
     return (
-        <div style={{zIndex: 5}}>
+        <div style={{ zIndex: 5 }}>
+            {Object.keys(customData.frames).map((key, index) => {
+                return <Sprite frame={customData.frames[key].frame} hover={key} />
+
+            })}
             <Header />
             <Row>
                 <Col style={{

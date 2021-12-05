@@ -45,7 +45,7 @@ class Simulator {
         if (skill_tree.points_remaining === 0) {
             return legal_actions;
         }
-        for (let [key, value] of skill_tree.skills.entries()) {
+        for (let [key] of skill_tree.skills.entries()) {
             if (skill_tree.isLegal(key)) {
                 legal_actions.push(key);
             }

@@ -1,20 +1,24 @@
-import React, { useContext } from 'react';
+import React, {useContext} from 'react';
 import SelectSettings from '../components/SelectSettings';
-import { AppContext } from '../context/AppContext';
+import {AppContext} from '../context/AppContext';
 import Header from '../components/Header';
-import { Row, Col, ListGroup } from 'react-bootstrap';
+import {Row, Col, ListGroup} from 'react-bootstrap';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
-import { capitalize } from 'lodash';
+import {capitalize} from 'lodash';
 
 const Home = () => {
     const { selectedSkills } = useContext(AppContext);
-
     return (
-        <div>
+        <div style={{zIndex: 5}}>
             <Header />
             <Row>
-                <Col sm={5}>
+                <Col style={{
+                    backgroundColor: '#ced0d4',
+                    padding: '15px',
+                    borderRadius: 10,
+                    height: '100%',
+                }} sm={4}>
                     <SelectSettings />
                 </Col>
 

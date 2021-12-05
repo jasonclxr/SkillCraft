@@ -37,7 +37,7 @@ const convertSkillsToRepresentation = (skills) => {
 
 const SelectSettings = () => {
     const [value, setValue] = useState({ healing: 16, close_range: 16, ranged: 16, adrenaline: 16, defense: 16, unique: 16 });
-    const [startTree, setTree] = useState(() => {
+    const [startTree] = useState(() => {
         const initialTree = createTree();
         return initialTree;
     });
@@ -81,9 +81,9 @@ const SelectSettings = () => {
     };
 
     return (
-        <Form>
+        <Form style={{width: '100%'}}>
             <Form.Group as={Row} className="mb-3">
-                <Form.Label column sm={2}>
+                <Form.Label>
                     Available Points
                 </Form.Label>
                 <Col>

@@ -1,4 +1,4 @@
-# CMPM 146 / AI as Theorycrafter
+# SkillCraft
 This project is a Monte Carlo tree search algorithm powered AI skill tree builder for the game Witcher 3: Wild Hunt. Specify which attributes you would like to achieve in your build and the number of skill points you have available, and the program will return where the points should be allocated. Built with React and Javascript.
 
 ## Project setup

@@ -394,8 +394,8 @@ function createTree(num_points = 50) {
 
     let shockWave = new Skill("Shock Wave", Attributes.DEFENSE, 3, 5, "signs");
     tree.skills.set("Shock Wave", shockWave);
-    let pyromanica = new Skill("Pyromanica", Attributes.CLOSE_RANGE, 3, 5, "signs");
-    tree.skills.set("Pyromanica", pyromanica);
+    let pyromaniac = new Skill("Pyromaniac", Attributes.CLOSE_RANGE, 3, 5, "signs");
+    tree.skills.set("Pyromaniac", pyromaniac);
     let superchargedGlyphs = new Skill("Supercharged Glyphs", Attributes.UNIQUE, 3, 5, "signs");
     tree.skills.set("Supercharged Glyphs", superchargedGlyphs);
     let quenDischarge = new Skill("Quen Discharge", Attributes.DEFENSE, 3, 5, "signs");

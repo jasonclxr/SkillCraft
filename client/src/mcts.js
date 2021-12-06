@@ -36,7 +36,6 @@ class Simulator {
         
         this.cared_about = [];
         this.caredAboutTraits();
-        console.log(this.cared_about);
     }
     nextState(skill_tree, skill_name) {
         let new_tree = SkillTree.from(skill_tree);
@@ -276,7 +275,7 @@ class MCTS {
             if(curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) continue;
             // 2nd heuristic: if we find a skill with a "Unique" trait and it's not desired, as well as being in the
             // skills trees other than "General Skills", roll a chance where 80% of the time, the skill is completely skipped
-            if(curr_skill_attr === "Unique" && curr_skill_branch !== "general" && Math.floor(Math.random() * 10) <= 8) continue;
+            if(curr_skill_attr === "Unique" && curr_skill_branch !== "general" && Math.floor(Math.random() * 10) < 8) continue;
 
             skill_tree = this.simulator.nextState(skill_tree, curr_skill_name);
         }
@@ -513,7 +512,7 @@ function generateSkills(desired_skills, num_points, mcts_tree = null) {
         let skill = mcts.think(mcts_tree);
         mcts_tree = simulator.nextState(mcts_tree, skill);
     }
-    simulator.printFractions(mcts_tree);
+    // simulator.printFractions(mcts_tree);
     return mcts_tree;
 }
 

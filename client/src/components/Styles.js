@@ -18,10 +18,10 @@ export const gridItem = {
   backgroundColor: '#ced0d4',
   padding: '15px 0px 15px 0px',
   borderRadius: 10,
-  margin: '0 10px 10px 0',
+  margin: '0 5px 10px 5px',
   textAlign: 'center',
   verticalAlign: 'middle',
-  width: '18%',
+  width: 'calc(20% - 10px)',
 }
 
 export const rowItem = {

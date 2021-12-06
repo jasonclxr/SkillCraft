@@ -5,6 +5,10 @@ import customData from '../imgs/skills-spritesheet.json';
 
 const Sprite = ({item}) => {
     const info = customData.frames[item.name]
+    if (!info) {
+        console.log(item.name)
+        return <div></div>;
+    }
     const style = {
         backgroundImage: `url(${backgroundImage})`,
         backgroundPosition: `${info.frame.x * (-1)}px ${info.frame.y * (-1)}px`,

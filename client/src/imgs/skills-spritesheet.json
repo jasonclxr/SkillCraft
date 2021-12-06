@@ -231,7 +231,7 @@
         "h": 64
       }
     },
-    "Delayed-Recovery": {
+    "Delayed Recovery": {
       "desc": "The effects of your potions don't wear off until your toxicity level falls below a certain amount.",
       "frame": {
         "x": 704,
@@ -252,7 +252,7 @@
         "h": 64
       }
     },
-    "Deadly-Precision": {
+    "Deadly Precision": {
       "desc": "The more adrenaline points you have, the more chance you have of killing an enemy instantly.",
       "frame": {
         "x": 768,

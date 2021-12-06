@@ -50,8 +50,11 @@ const Home = () => {
                                             return (
                                                 <Row xs={5} style={rowItem} key={rowIndex}>
                                                     {row.map((item, itemIndex) => {
+                                                        const trans = item.points === 0 ? {
+                                                            filter: 'opacity(35%)',
+                                                        } : {};
                                                         return (
-                                                            <Col xs={2} key={itemIndex} style={gridItem}>
+                                                            <Col xs={2} key={itemIndex} style={{...trans, ...gridItem}}>
                                                                 <Sprite item={item}/>
                                                                 {item.points} / {item.maxPoints}
                                                             </Col>

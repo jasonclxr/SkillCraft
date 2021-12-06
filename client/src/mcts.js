@@ -33,11 +33,23 @@ class Simulator {
         this.adrenaline_sim = desired_skills.adrenaline ?? 0;
         this.defense_sim = desired_skills.defense ?? 0;
         this.unique_sim = desired_skills.unique ?? 90;
+        
+        this.cared_about = [];
+        this.caredAboutTraits();
     }
     nextState(skill_tree, skill_name) {
         let new_tree = SkillTree.from(skill_tree);
         new_tree.addPoint(skill_name);
         return new_tree;
+    }
+
+    caredAboutTraits() {
+        if(this.healing_sim > 0) this.cared_about.push("Healing");
+        if(this.close_range_sim > 0) this.cared_about.push("Melee");
+        if(this.ranged_sim > 0) this.cared_about.push("Ranged");
+        if(this.adrenaline_sim > 0) this.cared_about.push("Adrenaline");
+        if(this.defense_sim > 0) this.cared_about.push("Defense");
+        if(this.unique_sim > 0) this.cared_about.push("Unique");
     }
 
     legalActions(skill_tree) {
@@ -55,6 +67,16 @@ class Simulator {
 
     isEnded(skill_tree) {
         return skill_tree.points_remaining < 1;
+    }
+
+    printFractions(skill_tree) {
+        let total = skill_tree.healing_count + skill_tree.close_range_count + skill_tree.ranged_count + skill_tree.adrenaline_count + skill_tree.defense_count + skill_tree.unique_count;
+        console.log("Healing: ", 100 * skill_tree.healing_count / total);
+        console.log("Close Range ", 100 * skill_tree.close_range_count / total);
+        console.log("Range: ", 100 * skill_tree.ranged_count / total);
+        console.log("Adrenaline: ", 100 * skill_tree.adrenaline_count / total);
+        console.log("Defense: ", 100 * skill_tree.defense_count / total);
+        console.log("Unique: ", 100 * skill_tree.unique_count / total);
     }
 
     getScore(skill_tree) {
@@ -228,8 +250,30 @@ class MCTS {
     expand_leaf(node, skill_tree) {
         let new_node = node;
         if (node.untried_skills.length > 0) {
-            let move_index = Math.floor(Math.random() * node.untried_skills.length);
-            let new_action = node.untried_skills[move_index];
+            let move_index = 0;
+            let new_action = "";
+            // Heurisitcs
+            let bad_skill = true;
+            while(bad_skill) {
+                move_index = Math.floor(Math.random() * node.untried_skills.length);
+                new_action = node.untried_skills[move_index];
+                let curr_skill_attr = skill_tree.skills.get(new_action).attribute.description;
+                let curr_skill_branch = skill_tree.skills.get(new_action).branch;
+                // 1st heuristic: if we find a general skill that has a trait we are not looking for, completely ignore
+                if(curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) {
+                    move_index = Math.floor(Math.random * node.untried_skills.length);
+                    new_action = node.untried_skills[move_index];
+                    continue;
+                // 2nd heuristic: if we find a skill with a "Unique" trait and it's not desired, as well as being in the
+                // skills trees other than "General Skills", roll a chance where 80% of the time, the skill is completely skipped
+                // } else if(curr_skill_attr === "Unique" && !this.simulator.cared_about.includes(curr_skill_attr)
+                //             && curr_skill_branch !== "general" && Math.floor(Math.random() * 10) < 8) {
+                //     move_index = Math.floor(Math.random * node.untried_skills.length);
+                //     new_action = node.untried_skills[move_index];
+                //     continue;
+                } else { bad_skill = false}
+            }
+
             skill_tree = this.simulator.nextState(skill_tree, new_action);
             new_node = new MCTSNode(node, new_action, this.simulator.legalActions(skill_tree));
             node.child_nodes.set(new_action, new_node);
@@ -477,6 +521,7 @@ function generateSkills(desired_skills, num_points, mcts_tree = null) {
         let skill = mcts.think(mcts_tree);
         mcts_tree = simulator.nextState(mcts_tree, skill);
     }
+    // simulator.printFractions(mcts_tree);
     return mcts_tree;
 }
 

@@ -29,7 +29,7 @@ class Simulator {
     constructor(desired_skills = {}) {
         this.healing_sim = desired_skills.healing ?? 0;
         this.close_range_sim = desired_skills.close_range ?? 0;
-        this.ranged_sim = desired_skills.range ?? 0;
+        this.ranged_sim = desired_skills.ranged ?? 0;
         this.adrenaline_sim = desired_skills.adrenaline ?? 0;
         this.defense_sim = desired_skills.defense ?? 0;
         this.unique_sim = desired_skills.unique ?? 90;
@@ -71,6 +71,16 @@ class Simulator {
             return true;
         }
         return false;
+    }
+
+    printFractions(skill_tree) {
+        let total = skill_tree.healing_count + skill_tree.close_range_count + skill_tree.ranged_count + skill_tree.adrenaline_count + skill_tree.defense_count + skill_tree.unique_count;
+        console.log("Healing: ", 100 * skill_tree.healing_count / total);
+        console.log("Close Range ", 100 * skill_tree.close_range_count / total);
+        console.log("Range: ", 100 * skill_tree.ranged_count / total);
+        console.log("Adrenaline: ", 100 * skill_tree.adrenaline_count / total);
+        console.log("Defense: ", 100 * skill_tree.defense_count / total);
+        console.log("Unique: ", 100 * skill_tree.unique_count / total);
     }
 
     getScore(skill_tree) {
@@ -263,6 +273,10 @@ class MCTS {
             var curr_skill_attr = skill_tree.skills.get(curr_skill_name).attribute.description;
             var curr_skill_branch = skill_tree.skills.get(curr_skill_name).branch;
             if(curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) continue;
+            // 2nd heuristic: if we find a skill with a "Unique" trait and it's not desired, as well as being in the
+            // skills trees other than "General Skills", roll a chance where 80% of the time, the skill is completely skipped
+            if(curr_skill_attr === "Unique" && curr_skill_branch !== "general" && Math.floor(Math.random() * 10) <= 8) continue;
+
             skill_tree = this.simulator.nextState(skill_tree, curr_skill_name);
         }
         return this.simulator.getScore(skill_tree);
@@ -498,6 +512,7 @@ function generateSkills(desired_skills, num_points, mcts_tree = null) {
         let skill = mcts.think(mcts_tree);
         mcts_tree = simulator.nextState(mcts_tree, skill);
     }
+    simulator.printFractions(mcts_tree);
     return mcts_tree;
 }
 

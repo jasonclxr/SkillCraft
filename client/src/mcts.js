@@ -250,14 +250,36 @@ class MCTS {
     expand_leaf(node, skill_tree) {
         let new_node = node;
         if (node.untried_skills.length > 0) {
-            let move_index = Math.floor(Math.random() * node.untried_skills.length);
-            let new_action = node.untried_skills[move_index];
+            let move_index = 0;
+            let new_action = "";
+            // Heurisitcs
+            let bad_skill = true;
+            while(bad_skill) {
+                move_index = Math.floor(Math.random() * node.untried_skills.length);
+                new_action = node.untried_skills[move_index];
+                let curr_skill_attr = skill_tree.skills.get(new_action).attribute.description;
+                let curr_skill_branch = skill_tree.skills.get(new_action).branch;
+                // 1st heuristic: if we find a general skill that has a trait we are not looking for, completely ignore
+                if(curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) {
+                    move_index = Math.floor(Math.random * node.untried_skills.length);
+                    new_action = node.untried_skills[move_index];
+                    continue;
+                // 2nd heuristic: if we find a skill with a "Unique" trait and it's not desired, as well as being in the
+                // skills trees other than "General Skills", roll a chance where 80% of the time, the skill is completely skipped
+                // } else if(curr_skill_attr === "Unique" && !this.simulator.cared_about.includes(curr_skill_attr)
+                //             && curr_skill_branch !== "general" && Math.floor(Math.random() * 10) < 8) {
+                //     move_index = Math.floor(Math.random * node.untried_skills.length);
+                //     new_action = node.untried_skills[move_index];
+                //     continue;
+                } else { bad_skill = false}
+            }
+
             skill_tree = this.simulator.nextState(skill_tree, new_action);
             //add logic for incrementing attributes count
             new_node = new MCTSNode(node, new_action, this.simulator.legalActions(skill_tree));
-            if (skill_tree.skills.get(node.untried_skills[move_index]).is_legal() === false) {
-                node.untried_skills.splice(move_index, 1);
-            }
+            // if (skill_tree.skills.get(node.untried_skills[move_index]).is_legal() === false) {
+            //     node.untried_skills.splice(move_index, 1);
+            // } 
             node.child_nodes.set(new_action, new_node);
         }
         return new_node;
@@ -268,16 +290,7 @@ class MCTS {
         while (this.simulator.isEnded(skill_tree) !== true) {
             var legal_actions = this.simulator.legalActions(skill_tree);
             var move_index = Math.floor(Math.random() * legal_actions.length);
-            var curr_skill_name = legal_actions[move_index];
-            // 1st heuristic: if we find a general skill that has a trait we are not looking for, completely ignore
-            var curr_skill_attr = skill_tree.skills.get(curr_skill_name).attribute.description;
-            var curr_skill_branch = skill_tree.skills.get(curr_skill_name).branch;
-            if(curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) continue;
-            // 2nd heuristic: if we find a skill with a "Unique" trait and it's not desired, as well as being in the
-            // skills trees other than "General Skills", roll a chance where 80% of the time, the skill is completely skipped
-            if(curr_skill_attr === "Unique" && curr_skill_branch !== "general" && Math.floor(Math.random() * 10) < 8) continue;
-
-            skill_tree = this.simulator.nextState(skill_tree, curr_skill_name);
+            skill_tree = this.simulator.nextState(skill_tree, legal_actions[move_index]);
         }
         return this.simulator.getScore(skill_tree);
     }

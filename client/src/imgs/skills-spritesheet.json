@@ -1,6 +1,7 @@
 {
   "frames": {
     "Anatomical Knowledge": {
+      "desc": "Increases your chance of landing a critical hit with a crossbow bolt.",
       "frame": {
         "x": 0,
         "y": 0,
@@ -21,6 +22,7 @@
       }
     },
     "Arrow Deflection": {
+      "desc": "You'll automatically deflect arrows while you're blocking.",
       "frame": {
         "x": 64,
         "y": 0,
@@ -41,6 +43,7 @@
       }
     },
     "Axii Intensity": {
+      "desc": "Increases the effectiveness of axii.",
       "frame": {
         "x": 128,
         "y": 0,
@@ -61,6 +64,7 @@
       }
     },
     "Bear School Techniques": {
+      "desc": "For every piece of heavy armour that you have equipped, your maximum health increases by 5 per cent, and the damage of your strong attacks is increased by 5 per cent.",
       "frame": {
         "x": 192,
         "y": 0,
@@ -81,6 +85,7 @@
       }
     },
     "Cat School Techniques": {
+      "desc": "For every piece of light armour that you have equipped, your critical hits do 25 per cent more damage, and the damage of your fast attacks is increased by 5 per cent.",
       "frame": {
         "x": 256,
         "y": 0,
@@ -101,6 +106,7 @@
       }
     },
     "Cluster Bombs": {
+      "desc": "Bombs explode into damaging fragments.",
       "frame": {
         "x": 320,
         "y": 0,
@@ -121,6 +127,7 @@
       }
     },
     "Cold Blood": {
+      "desc": "You gain more adrenaline points every time you hit an enemy with a crossbow bolt.",
       "frame": {
         "x": 384,
         "y": 0,
@@ -140,7 +147,8 @@
         "h": 64
       }
     },
-    "Counter Attac": {
+    "Counter Attack": {
+      "desc": "Increases the damage of your follow-up attacks after you successfully perform a counter.",
       "frame": {
         "x": 448,
         "y": 0,
@@ -161,6 +169,7 @@
       }
     },
     "Crippling Shot": {
+      "desc": "Critical hits with the crossbow stop monsters from using their special abilities.",
       "frame": {
         "x": 512,
         "y": 0,
@@ -181,6 +190,7 @@
       }
     },
     "Crippling Strikes": {
+      "desc": "Fast attacks make enemies bleed, which means that their health continues to drain away after you land a successful hit.",
       "frame": {
         "x": 576,
         "y": 0,
@@ -201,6 +211,7 @@
       }
     },
     "Crushing Blows": {
+      "desc": "Increases the chances of landing a critical hit with strong attacks. Also increases the critical damage that they cause.",
       "frame": {
         "x": 640,
         "y": 0,
@@ -220,7 +231,8 @@
         "h": 64
       }
     },
-    "Delayed-Recovery": {
+    "Delayed Recovery": {
+      "desc": "The effects of your potions don't wear off until your toxicity level falls below a certain amount.",
       "frame": {
         "x": 704,
         "y": 0,
@@ -240,7 +252,8 @@
         "h": 64
       }
     },
-    "Deadly-Precision": {
+    "Deadly Precision": {
+      "desc": "The more adrenaline points you have, the more chance you have of killing an enemy instantly.",
       "frame": {
         "x": 768,
         "y": 0,
@@ -261,6 +274,7 @@
       }
     },
     "Delusion": {
+      "desc": "Targeted enemy doesn't move towards you when you're casting axii. Also opens up unique dialogue options at various points in the game.",
       "frame": {
         "x": 832,
         "y": 0,
@@ -281,6 +295,7 @@
       }
     },
     "Domination": {
+      "desc": "You can now take control of two enemies at the same time, but the effects are weakened.",
       "frame": {
         "x": 896,
         "y": 0,
@@ -301,6 +316,7 @@
       }
     },
     "Efficiency": {
+      "desc": "You can carry more bombs in each inventory slot.",
       "frame": {
         "x": 960,
         "y": 0,
@@ -321,6 +337,7 @@
       }
     },
     "Endure Pain": {
+      "desc": "Maximum health increases when your toxicity level goes beyond the safe threshold.",
       "frame": {
         "x": 1024,
         "y": 0,
@@ -341,6 +358,7 @@
       }
     },
     "Far Reaching Aard": {
+      "desc": "Increases aard's range.",
       "frame": {
         "x": 1088,
         "y": 0,
@@ -361,6 +379,7 @@
       }
     },
     "Exploding Shield": {
+      "desc": "When your quen shield is broken, it will push enemies back.",
       "frame": {
         "x": 1152,
         "y": 0,
@@ -381,6 +400,7 @@
       }
     },
     "Fast Metabolism": {
+      "desc": "Your toxicity level decreases faster",
       "frame": {
         "x": 1216,
         "y": 0,
@@ -401,6 +421,7 @@
       }
     },
     "Fixative": {
+      "desc": "Oils last longer before they wear off.",
       "frame": {
         "x": 1280,
         "y": 0,
@@ -421,6 +442,7 @@
       }
     },
     "Firestream": {
+      "desc": "Igni can now be used like a flamethrower.",
       "frame": {
         "x": 1344,
         "y": 0,
@@ -441,6 +463,7 @@
       }
     },
     "Fleet Footed": {
+      "desc": "If an enemy hits you as you're evading, the attack will do reduced damage.",
       "frame": {
         "x": 1408,
         "y": 0,
@@ -461,6 +484,7 @@
       }
     },
     "Flood of Anger": {
+      "desc": "Automatically use up adrenaline points to increase the effectiveness of your magic signs.",
       "frame": {
         "x": 1472,
         "y": 0,
@@ -481,6 +505,7 @@
       }
     },
     "Focus": {
+      "desc": "Adrenaline points increase your damage from your swordplay and your signs.",
       "frame": {
         "x": 1536,
         "y": 0,
@@ -501,6 +526,7 @@
       }
     },
     "Frenzy": {
+      "desc": "When you toxicity level is above zero, time will slow when an enemy is about to perform a counterattack.",
       "frame": {
         "x": 1600,
         "y": 0,
@@ -521,6 +547,7 @@
       }
     },
     "Griffin School Techniques": {
+      "desc": "For every piece of medium armour that you have equipped, signs are 5 per cent more effective, and stamina regenerates 5 per cent faster.",
       "frame": {
         "x": 1664,
         "y": 0,
@@ -541,6 +568,7 @@
       }
     },
     "Heightened Tolerance": {
+      "desc": "Increases your potion overdose threshold, allowing you to drink more before you're in danger.",
       "frame": {
         "x": 1728,
         "y": 0,
@@ -561,6 +589,7 @@
       }
     },
     "Hunter Instinct": {
+      "desc": "When you adrenaline points are at maximum, you have more chance to perform critical hits against enemies that are weak to your current oil type.",
       "frame": {
         "x": 1792,
         "y": 0,
@@ -581,6 +610,7 @@
       }
     },
     "Igni Intensity": {
+      "desc": "Increases the effectiveness of igni.",
       "frame": {
         "x": 1856,
         "y": 0,
@@ -601,6 +631,7 @@
       }
     },
     "Killing Spree": {
+      "desc": "When your toxicity level is above zero, every enemy that you kill increases your chances of getting a critical hit.",
       "frame": {
         "x": 1920,
         "y": 0,
@@ -621,6 +652,7 @@
       }
     },
     "Lightning Reflexes": {
+      "desc": "When you're aiming your crossbow, time is slowed down more with each invested skill point.",
       "frame": {
         "x": 1984,
         "y": 0,
@@ -641,6 +673,7 @@
       }
     },
     "Magic Trap": {
+      "desc": "Yrden's alternate form. It becomes a single glyph that zaps nearby foes for small chunks of damage. Projectiles are also destroyed if they fly too close.",
       "frame": {
         "x": 2048,
         "y": 0,
@@ -661,6 +694,7 @@
       }
     },
     "Melt Armor": {
+      "desc": "Igni now weakens enemy armour when it connects.",
       "frame": {
         "x": 2112,
         "y": 0,
@@ -681,6 +715,7 @@
       }
     },
     "Metabolism Control": {
+      "desc": "Increases your maximum toxicity level by 30 points.",
       "frame": {
         "x": 2176,
         "y": 0,
@@ -701,6 +736,7 @@
       }
     },
     "Muscle Memory": {
+      "desc": "Each level makes your fast attacks do more damage and generate more adrenaline points.",
       "frame": {
         "x": 2240,
         "y": 0,
@@ -721,6 +757,7 @@
       }
     },
     "Poisoned Blades": {
+      "desc": "With an oiled sword, each attack now has a chance to poison your enemy.",
       "frame": {
         "x": 2304,
         "y": 0,
@@ -741,6 +778,7 @@
       }
     },
     "Precise Blows": {
+      "desc": "Each level gives you a better chance of landing critical hits with fast attacks, and makes critical hits.",
       "frame": {
         "x": 2368,
         "y": 0,
@@ -761,6 +799,7 @@
       }
     },
     "Protective Coating": {
+      "desc": "Provides additional protection against attacks from enemies that are weak to your currently applied oil.",
       "frame": {
         "x": 2432,
         "y": 0,
@@ -781,6 +820,7 @@
       }
     },
     "Pyromaniac": {
+      "desc": "Igni now has a better chance to set enemies on fire.",
       "frame": {
         "x": 2496,
         "y": 0,
@@ -801,6 +841,7 @@
       }
     },
     "Puppet": {
+      "desc": "Make your target an ally for a short time. Your new ally will also do more damage with its attacks.",
       "frame": {
         "x": 2560,
         "y": 0,
@@ -821,6 +862,7 @@
       }
     },
     "Pyrotechnics": {
+      "desc": "Bombs that don't usually inflict damage now cause damage along with their existing effects.",
       "frame": {
         "x": 2624,
         "y": 0,
@@ -841,6 +883,7 @@
       }
     },
     "Quen Discharge": {
+      "desc": "Reflects damage back at the attacker whenever the shield takes a hit.",
       "frame": {
         "x": 2688,
         "y": 0,
@@ -861,6 +904,7 @@
       }
     },
     "Quen Intensity": {
+      "desc": "Increases the effectiveness of the quen sign.",
       "frame": {
         "x": 2752,
         "y": 0,
@@ -881,6 +925,7 @@
       }
     },
     "Razor Focus": {
+      "desc": "Gain an adrenaline point when combat begins, and get more points for each sword attack.",
       "frame": {
         "x": 2816,
         "y": 0,
@@ -901,6 +946,7 @@
       }
     },
     "Rage Management": {
+      "desc": "If you don't have enough stamina to cast signs, you'll use adrenaline points instead.",
       "frame": {
         "x": 2880,
         "y": 0,
@@ -921,6 +967,7 @@
       }
     },
     "Refreshment": {
+      "desc": "Each potion that you drink restores a portion of your health.",
       "frame": {
         "x": 2944,
         "y": 0,
@@ -941,6 +988,7 @@
       }
     },
     "Rend": {
+      "desc": "A mighty blow that uses stamina. It ignores enemy defence and has an extra chance of a critical hit. On top of that, adrenaline points increase the total damage.",
       "frame": {
         "x": 3008,
         "y": 0,
@@ -961,6 +1009,7 @@
       }
     },
     "Resolve": {
+      "desc": "You lose less adrenaline points when you take damage.",
       "frame": {
         "x": 3072,
         "y": 0,
@@ -981,6 +1030,7 @@
       }
     },
     "Shock Wave": {
+      "desc": "Aard now does damage.",
       "frame": {
         "x": 3136,
         "y": 0,
@@ -1001,6 +1051,7 @@
       }
     },
     "Side Effects": {
+      "desc": "Using a potion gives you a chance of activating the effects of another randomly-selected potion. If it does activate, there's no impact on your toxicity level from the extra effects.",
       "frame": {
         "x": 3200,
         "y": 0,
@@ -1021,6 +1072,7 @@
       }
     },
     "Steady Aim": {
+      "desc": "Further slows time when you're throwing a bomb.",
       "frame": {
         "x": 3264,
         "y": 0,
@@ -1041,6 +1093,7 @@
       }
     },
     "Steady Shot": {
+      "desc": "Crossbow bolts deal 25 per cent more damage.",
       "frame": {
         "x": 3328,
         "y": 0,
@@ -1061,6 +1114,7 @@
       }
     },
     "Strength Training": {
+      "desc": "Each level increases the damage and adrenaline point gain of your strong attacks.",
       "frame": {
         "x": 3392,
         "y": 0,
@@ -1081,6 +1135,7 @@
       }
     },
     "Sun and Stars": {
+      "desc": "Your health regenerates faster during the day when you're not in combat, and your stamina recovers faster at night when you're in combat.",
       "frame": {
         "x": 3456,
         "y": 0,
@@ -1101,6 +1156,7 @@
       }
     },
     "Sunder Armor": {
+      "desc": "Reduces an enemy's damage resistance whenever you land a strong attack.",
       "frame": {
         "x": 3520,
         "y": 0,
@@ -1121,6 +1177,7 @@
       }
     },
     "Supercharged Glyphs": {
+      "desc": "Enemies affected by yrden take continuous damage.",
       "frame": {
         "x": 3584,
         "y": 0,
@@ -1141,6 +1198,7 @@
       }
     },
     "Sustained Glyphs": {
+      "desc": "Makes yrden last longer.",
       "frame": {
         "x": 3648,
         "y": 0,
@@ -1161,6 +1219,7 @@
       }
     },
     "Survival Instinct": {
+      "desc": "Boosts your health by 500 points.",
       "frame": {
         "x": 3712,
         "y": 0,
@@ -1181,6 +1240,7 @@
       }
     },
     "Synergy": {
+      "desc": "Increases the statistic bonuses of equipped mutagens",
       "frame": {
         "x": 3776,
         "y": 0,
@@ -1201,6 +1261,7 @@
       }
     },
     "Tissue Transmutation": {
+      "desc": "Mutagen decoctions also increase your maximum health until they wear off.",
       "frame": {
         "x": 3840,
         "y": 0,
@@ -1221,6 +1282,7 @@
       }
     },
     "Undying": {
+      "desc": "If your health reaches zero, you'll be revived as long as you have adrenaline points. The more you have, the more health you'll get back.",
       "frame": {
         "x": 3904,
         "y": 0,
@@ -1241,6 +1303,7 @@
       }
     },
     "Whirl": {
+      "desc": "A fast spinning attack. Using it drains stamina and adrenaline points.",
       "frame": {
         "x": 3968,
         "y": 0,
@@ -1261,6 +1324,7 @@
       }
     },
     "Yrden Intensity": {
+      "desc": "Increases the effectiveness of yrden.",
       "frame": {
         "x": 4032,
         "y": 0,
@@ -1281,6 +1345,7 @@
       }
     },
     "Aard Intensity": {
+      "desc": "Makes aard more effective.",
       "frame": {
         "x": 4096,
         "y": 0,
@@ -1301,6 +1366,7 @@
       }
     },
     "Aard Sweep": {
+      "desc": "Aard can cover the area around you, rather than just in front of you. However, it has less chance to knock enemies down completely.",
       "frame": {
         "x": 4160,
         "y": 0,
@@ -1321,6 +1387,7 @@
       }
     },
     "Acquired Tolerance": {
+      "desc": "For every alchemy formula that you know, your maximum toxicity level increases.",
       "frame": {
         "x": 4224,
         "y": 0,
@@ -1341,6 +1408,7 @@
       }
     },
     "Active Shield": {
+      "desc": "You can now use quen as a sustained shield that drains stamina. When the shield takes damage, it restores your health.",
       "frame": {
         "x": 4288,
         "y": 0,
@@ -1361,6 +1429,7 @@
       }
     },
     "Adaption": {
+      "desc": "Makes all decoctions last longer.",
       "frame": {
         "x": 4352,
         "y": 0,
@@ -1381,6 +1450,7 @@
       }
     },
     "Adrenaline Burst": {
+      "desc": "Increases how quickly you gain adrenaline points. On top of that, signs now also generate adrenaline points.",
       "frame": {
         "x": 4416,
         "y": 0,

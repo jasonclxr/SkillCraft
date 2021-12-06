@@ -8,7 +8,6 @@ import Tab from 'react-bootstrap/Tab';
 import { capitalize } from 'lodash';
 import Sprite from '../components/Sprite';
 import {Container} from 'react-bootstrap';
-import customData from '../imgs/skills-spritesheet.json';
 import {container, gridItem, rowItem} from '../components/Styles';
 
 const chunkArrayInGroups = (arr, size) => {
@@ -44,7 +43,6 @@ const Home = () => {
                             if (selectedSkills) {
                                 data = chunkArrayInGroups(selectedSkills[key], 5);
                             }
-                            console.log(data);
                             return (
                                 <Tab eventKey={key} title={capitalize(key) + " Skills"} key={index}>
                                     <Container style={container}>
@@ -52,9 +50,12 @@ const Home = () => {
                                             return (
                                                 <Row xs={5} style={rowItem} key={rowIndex}>
                                                     {row.map((item, itemIndex) => {
+                                                        const trans = item.points === 0 ? {
+                                                            filter: 'opacity(35%)',
+                                                        } : {};
                                                         return (
-                                                            <Col xs={2} key={itemIndex} style={gridItem}>
-                                                                <Sprite frame={customData.frames[item.name].frame} title={item.name} />
+                                                            <Col xs={2} key={itemIndex} style={{...trans, ...gridItem}}>
+                                                                <Sprite item={item}/>
                                                                 {item.points} / {item.maxPoints}
                                                             </Col>
                                                         );

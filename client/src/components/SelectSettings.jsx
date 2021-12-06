@@ -12,8 +12,6 @@ const convertSkillsToRepresentation = (skills) => {
     let alchemy = [];
     let generals = [];
     for (let [, value] of skills) {
-        if (value.points === 0)
-            continue;
         switch (value.branch) {
             case "combat":
                 combats.push(value);
@@ -59,7 +57,7 @@ const SelectSettings = () => {
 
     const MAX_SKILLS = 96;
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
     };
@@ -107,7 +105,8 @@ const SelectSettings = () => {
                         <Col style={{display: 'flex', alignItems:'center'}}>
                             {value[key]}
                         </Col>
-                    </Form.Group>);
+                    </Form.Group>
+                );
             })}
 
             <Form.Group as={Row} className="mb-3">

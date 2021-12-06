@@ -29,7 +29,7 @@ class Simulator {
     constructor(desired_skills = {}) {
         this.healing_sim = desired_skills.healing ?? 0;
         this.close_range_sim = desired_skills.close_range ?? 0;
-        this.ranged_sim = desired_skills.range ?? 0;
+        this.ranged_sim = desired_skills.ranged ?? 0;
         this.adrenaline_sim = desired_skills.adrenaline ?? 0;
         this.defense_sim = desired_skills.defense ?? 0;
         this.unique_sim = desired_skills.unique ?? 90;

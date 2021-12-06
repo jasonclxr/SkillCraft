@@ -3,7 +3,7 @@ import { Form, Button, Spinner, Col, Row } from 'react-bootstrap';
 
 import { generateSkills, createTree } from '../mcts.js';
 import { AppContext } from '../context/AppContext';
-import { capitalize } from 'lodash';
+import { camelCase, startCase } from 'lodash';
 
 
 const convertSkillsToRepresentation = (skills) => {
@@ -75,11 +75,19 @@ const SelectSettings = () => {
         let nextMax = calculateMaxID(key);
         let newValue = parseInt(e.target.value);
         let difference = value[key] - newValue;
-        setValue({ ...value, [key]: newValue, [nextMax]: value[nextMax] + difference });
+        let newNext = value[nextMax] + difference;
+        if (newNext < 0) {
+            newNext = 0;
+            newValue += (newNext);
+        }
+        if (newNext > MAX_SKILLS) {
+            newNext = MAX_SKILLS;
+        }
+        setValue({ ...value, [key]: newValue, [nextMax]: newNext });
     };
 
     return (
-        <Form style={{width: '100%'}}>
+        <Form style={{ width: '100%' }}>
             <Form.Group as={Row} className="mb-3">
                 <Form.Label>
                     <b>Available Points</b>
@@ -87,22 +95,22 @@ const SelectSettings = () => {
                 <Col>
                     <Form.Control type="number" pattern="^[0-9]" value={pointCount} onChange={e => setPointCount(parseInt(e.target.value))} />
                 </Col>
-                <Col style={{display: 'flex', alignItems:'center'}}>
+                <Col style={{ display: 'flex', alignItems: 'center' }}>
                     {pointCount}
                 </Col>
             </Form.Group>
             {Object.keys(value).map((key, index) => {
                 return (
                     <Form.Group as={Row} className="mb-3" key={index}>
-                        <Col style={{display: 'flex', alignItems:'center'}}>
+                        <Col style={{ display: 'flex', alignItems: 'center' }}>
                             <Form.Label column sm={2}>
-                                <b>{capitalize(key)}</b>
+                                <b>{startCase(camelCase(key.replace(/_/g, " ")))}</b>
                             </Form.Label>
                         </Col>
-                        <Col style={{display: 'flex', alignItems:'center'}}>
+                        <Col style={{ display: 'flex', alignItems: 'center' }}>
                             <Form.Range value={value[key]} onChange={e => calculateSliders(e, key)} min={0} max={MAX_SKILLS} />
                         </Col>
-                        <Col style={{display: 'flex', alignItems:'center'}}>
+                        <Col style={{ display: 'flex', alignItems: 'center' }}>
                             {value[key]}
                         </Col>
                     </Form.Group>

@@ -3,7 +3,7 @@ import { OverlayTrigger, Popover } from 'react-bootstrap';
 import backgroundImage from '../imgs/Skill-Sprite-Sheet.png';
 import customData from '../imgs/skills-spritesheet.json';
 
-const Sprite = ({item}) => {
+const Sprite = ({ item }) => {
     const info = customData.frames[item.name]
     if (!info) {
         console.log(item.name)

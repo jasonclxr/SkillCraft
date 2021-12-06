@@ -1,0 +1,78 @@
+@import "../node_modules/bootstrap/scss/functions";
+$sizes: ();
+@import "../node_modules/bootstrap/scss/variables";
+@import url('https://fonts.googleapis.com/css2?family=Dosis&display=swap');
+
+@font-face{
+    font-family:"witcher-font";
+    src:url("/imgs/Thewitcher-jnOj.ttf") format("truetype"),
+}
+
+$grid-color:  #ced0d4;
+
+
+$nav-link-font-weight:              null;
+$nav-link-color:                    $light;
+$nav-link-hover-color:              shade-color($nav-link-color, $link-shade-percentage/2);
+
+$nav-tabs-link-active-bg:           $grid-color;
+  
+.settingsForm {
+        background-color: $grid-color;
+        padding: 15px;
+        border-radius: 5px;
+        height: 100%;
+}
+
+.witcherTitle {
+    font-family: "witcher-font";
+}
+
+.gridItem {
+    background-color: $grid-color;
+    font-family: 'Dosis', normal;
+    padding: 15px 0px 15px 0px;
+    border-radius: 10px;
+    margin: 0 5px 10px 5px;
+    text-align: center;
+    vertical-align: middle;
+    width: calc(20% - 10px);
+    // change these lines later if you want, these are a copy-paste of code
+    position: relative;
+    top: 0px;
+    transition: top ease 0.5s;
+  }
+
+  .gridItem:active, .gridItem:hover{
+    -webkit-box-shadow: 11px 13px 13px -3px #000000; 
+    box-shadow: 11px 13px 13px -3px #000000;
+    top: -5px;
+  }
+
+  .gridItem[disabled] {
+    filter: opacity(35%);
+  }
+
+  .rowItem {
+    margin: 0px 0px 0px 0px;
+  }
+  .gridContainer {
+      padding: 0px 0px 0px 0px;
+  }
+
+  .customBackground {
+        position: fixed;
+        background-image: url("/imgs/background.png");
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        height: 110vh;
+        width: 110vw;
+        left: -5vw;
+        top: -5vh;
+        z-index: -1000;
+        filter: blur(5px) invert(25%);
+  }
+
+// Import Bootstrap and its default variables
+@import '~bootstrap/scss/bootstrap.scss';

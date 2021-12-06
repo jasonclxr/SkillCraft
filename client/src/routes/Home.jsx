@@ -53,7 +53,7 @@ const Home = () => {
                                                 <Row xs={5} style={rowItem} key={rowIndex}>
                                                     {row.map((item, itemIndex) => {
                                                         return (
-                                                            <Col xs={2} key={itemIndex} style={gridItem}>
+                                                            <Col key={itemIndex} style={gridItem}>
                                                                 <Sprite frame={customData.frames[item.name].frame} title={item.name} />
                                                                 {item.points} / {item.maxPoints}
                                                             </Col>

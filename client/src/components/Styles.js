@@ -21,6 +21,7 @@ export const gridItem = {
   margin: '0 10px 10px 0',
   textAlign: 'center',
   verticalAlign: 'middle',
+  width: '18%',
 }
 
 export const rowItem = {

@@ -231,11 +231,7 @@ class MCTS {
             let move_index = Math.floor(Math.random() * node.untried_skills.length);
             let new_action = node.untried_skills[move_index];
             skill_tree = this.simulator.nextState(skill_tree, new_action);
-            //add logic for incrementing attributes count
             new_node = new MCTSNode(node, new_action, this.simulator.legalActions(skill_tree));
-            if (skill_tree.skills.get(node.untried_skills[move_index]).is_legal() === false) {
-                node.untried_skills.splice(move_index, 1);
-            }
             node.child_nodes.set(new_action, new_node);
         }
         return new_node;

@@ -52,7 +52,7 @@ const SelectSettings = () => {
             setSelectedSkills(selected_skills);
             setLoading(false);
         }
-    }, [isLoading, pointCount, setSelectedSkills, startTree, value.healing, value.close_range, value.ranged, value.adrenaline, value.defense, value.unique]);
+    }, [isLoading, pointCount, setSelectedSkills, startTree, value, value.healing, value.close_range, value.ranged, value.adrenaline, value.defense, value.unique]);
 
 
     const MAX_SKILLS = 96;
@@ -111,7 +111,7 @@ const SelectSettings = () => {
                             <Form.Range value={value[key]} onChange={e => calculateSliders(e, key)} min={0} max={MAX_SKILLS} />
                         </Col>
                         <Col style={{ display: 'flex', alignItems: 'center' }}>
-                            {value[key]}
+                            {value[key]}%
                         </Col>
                     </Form.Group>
                 );

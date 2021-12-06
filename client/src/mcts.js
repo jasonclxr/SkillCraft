@@ -486,6 +486,3 @@ function generateSkills(desired_skills, num_points, mcts_tree = null) {
 
 exports.generateSkills = generateSkills;
 exports.createTree = createTree;
-
-//http://www.rpg-gaming.com/tw3.html
-//https://www.gosunoob.com/witcher-3/skill-calculator/

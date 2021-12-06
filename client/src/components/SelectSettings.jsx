@@ -59,7 +59,7 @@ const SelectSettings = () => {
 
     const MAX_SKILLS = 96;
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
     };

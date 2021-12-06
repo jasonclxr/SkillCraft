@@ -1,9 +1,20 @@
-CMPM 146 / AI as Theorycrafter
-Jason Blecman, Mason Woodford, Andrew Gavgavian, Ivan Martinez-Arias
+# CMPM 146 / AI as Theorycrafter
+This project is a Monte Carlo tree search algorithm powered AI skill tree builder for the game Witcher 3: Wild Hunt. Specify which attributes you would like to achieve in your build and the number of skill points you have available, and the program will return where the points should be allocated. Built with React and Javascript.
 
-skills.js:
-    Provides a basic structure of how the skill data is organized, as well as having a comment
-    at the bottom to have all the names of the skills stored alongside how many points can be allocated.
+## Project setup
 
-mcts.js:
-    TO DO
+### Install packages
+```
+npm install
+```
+
+### Run the Application
+```
+npm run start
+```
+
+You may access the frontend from localhost:3000/ in your browser.
+
+Created by: Jason Blecman, Mason Woodford, Andrew Gavgavian, Ivan Martinez-Arias
+
+

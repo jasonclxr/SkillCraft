@@ -1,14 +1,17 @@
 import React from 'react';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import backgroundImage from '../imgs/Skill-Sprite-Sheet.png';
+import customData from '../imgs/skills-spritesheet.json';
 
-const Sprite = ({ frame, hover }) => {
+const Sprite = ({item}) => {
+    const info = customData.frames[item.name]
     const style = {
         backgroundImage: `url(${backgroundImage})`,
-        backgroundPosition: `${frame.x * (-1)}px ${frame.y * (-1)}px`,
+        backgroundPosition: `${info.frame.x * (-1)}px ${info.frame.y * (-1)}px`,
         backgroundRepeat: 'no-repeat',
-        width: frame.w,
-        height: frame.h,
+        width: info.frame.w,
+        height: info.frame.h,
+        margin: '0 auto',
     };
 
     return (
@@ -16,9 +19,11 @@ const Sprite = ({ frame, hover }) => {
             placement={'bottom'}
             overlay={
                 <Popover id={`popover-sprite`}>
-                    <Popover.Header as="h3">{hover}</Popover.Header>
+                    <Popover.Header as="h3">
+                        {`${item.points}/${item.maxPoints} ${item.name}`}
+                    </Popover.Header>
                     <Popover.Body>
-                        {hover}
+                        {info.desc}
                     </Popover.Body>
                 </Popover>
             }>

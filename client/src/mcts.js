@@ -449,7 +449,7 @@ function createTree(num_points = 50) {
 
     let sunAndStars = new Skill("Sun and Stars", Attributes.HEALING, 0, 1, "general");
     tree.skills.set("Sun and Stars", sunAndStars);
-    let survivalInstinct = new Skill("Surival Instinct", Attributes.HEALING, 0, 1, "general");
+    let survivalInstinct = new Skill("Survival Instinct", Attributes.HEALING, 0, 1, "general");
     tree.skills.set("Survival Instinct", survivalInstinct);
     let catSchoolTechniques = new Skill("Cat School Techniques", Attributes.CLOSE_RANGE, 0, 1, "general");
     tree.skills.set("Cat School Techniques", catSchoolTechniques);

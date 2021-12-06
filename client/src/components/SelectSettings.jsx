@@ -37,7 +37,7 @@ const convertSkillsToRepresentation = (skills) => {
 
 const SelectSettings = () => {
     const [value, setValue] = useState({ healing: 16, close_range: 16, ranged: 16, adrenaline: 16, defense: 16, unique: 16 });
-    const [startTree, setTree] = useState(() => {
+    const [startTree] = useState(() => {
         const initialTree = createTree();
         return initialTree;
     });
@@ -59,7 +59,7 @@ const SelectSettings = () => {
 
     const MAX_SKILLS = 96;
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
     };
@@ -81,28 +81,30 @@ const SelectSettings = () => {
     };
 
     return (
-        <Form>
+        <Form style={{width: '100%'}}>
             <Form.Group as={Row} className="mb-3">
-                <Form.Label column sm={2}>
-                    Available Points
+                <Form.Label>
+                    <b>Available Points</b>
                 </Form.Label>
                 <Col>
-                    <Form.Control type="number" value={pointCount} onChange={e => setPointCount(parseInt(e.target.value))} />
+                    <Form.Control type="number" pattern="^[0-9]" value={pointCount} onChange={e => setPointCount(parseInt(e.target.value))} />
                 </Col>
-                <Col>
+                <Col style={{display: 'flex', alignItems:'center'}}>
                     {pointCount}
                 </Col>
             </Form.Group>
             {Object.keys(value).map((key, index) => {
                 return (
                     <Form.Group as={Row} className="mb-3" key={index}>
-                        <Form.Label column sm={2}>
-                            {capitalize(key)}
-                        </Form.Label>
-                        <Col>
+                        <Col style={{display: 'flex', alignItems:'center'}}>
+                            <Form.Label column sm={2}>
+                                <b>{capitalize(key)}</b>
+                            </Form.Label>
+                        </Col>
+                        <Col style={{display: 'flex', alignItems:'center'}}>
                             <Form.Range value={value[key]} onChange={e => calculateSliders(e, key)} min={0} max={MAX_SKILLS} />
                         </Col>
-                        <Col>
+                        <Col style={{display: 'flex', alignItems:'center'}}>
                             {value[key]}
                         </Col>
                     </Form.Group>);
@@ -110,19 +112,21 @@ const SelectSettings = () => {
 
             <Form.Group as={Row} className="mb-3">
                 <Col>
-                    <Button type="submit" onClick={!isLoading ? e => handleSubmit(e) : null} disabled={isLoading}>
+                    <div className="d-grid gap-2">
+                        <Button type="submit" onClick={!isLoading ? e => handleSubmit(e) : null} disabled={isLoading}>
 
-                        {isLoading ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                            />
-                        ) : null}
-                        {isLoading ? ' Loading…' : 'Compute'}
-                    </Button>
+                            {isLoading ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />
+                            ) : null}
+                            {isLoading ? ' Loading…' : 'Compute'}
+                        </Button>
+                    </div>
                 </Col>
             </Form.Group>
         </Form>

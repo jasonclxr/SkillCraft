@@ -39,7 +39,7 @@ class Simulator {
         console.log(this.cared_about);
     }
     nextState(skill_tree, skill_name) {
-        let new_tree = new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row, skill_tree.healing_count, skill_tree.close_range_count, skill_tree.ranged_count, skill_tree.adrenaline_count, skill_tree.defense_count, skill_tree.unique_count);
+        let new_tree = SkillTree.from(skill_tree);
         new_tree.addPoint(skill_name);
         return new_tree;
     }
@@ -58,7 +58,7 @@ class Simulator {
         if (skill_tree.points_remaining === 0) {
             return legal_actions;
         }
-        for (let [key, value] of skill_tree.skills.entries()) {
+        for (let [key] of skill_tree.skills.entries()) {
             if (skill_tree.isLegal(key)) {
                 legal_actions.push(key);
             }
@@ -67,10 +67,7 @@ class Simulator {
     }
 
     isEnded(skill_tree) {
-        if (skill_tree.points_remaining < 1) {
-            return true;
-        }
-        return false;
+        return skill_tree.points_remaining < 1;
     }
 
     printFractions(skill_tree) {
@@ -117,6 +114,10 @@ class SkillTree {
         this.adrenaline_count = adrenaline_count;
         this.defense_count = defense_count;
         this.unique_count = unique_count;
+    }
+
+    static from(skill_tree) {
+        return new SkillTree(copier.cloneDeep(skill_tree.skills), skill_tree.points_remaining, skill_tree.combat_count, skill_tree.combat_row, skill_tree.signs_count, skill_tree.signs_row, skill_tree.alchemy_count, skill_tree.alchemy_row, skill_tree.healing_count, skill_tree.close_range_count, skill_tree.ranged_count, skill_tree.adrenaline_count, skill_tree.defense_count, skill_tree.unique_count);
     }
 
     addPoint(skill_name) {
@@ -480,7 +481,7 @@ function createTree(num_points = 50) {
 
     let sunAndStars = new Skill("Sun and Stars", Attributes.HEALING, 0, 1, "general");
     tree.skills.set("Sun and Stars", sunAndStars);
-    let survivalInstinct = new Skill("Surival Instinct", Attributes.HEALING, 0, 1, "general");
+    let survivalInstinct = new Skill("Survival Instinct", Attributes.HEALING, 0, 1, "general");
     tree.skills.set("Survival Instinct", survivalInstinct);
     let catSchoolTechniques = new Skill("Cat School Techniques", Attributes.CLOSE_RANGE, 0, 1, "general");
     tree.skills.set("Cat School Techniques", catSchoolTechniques);

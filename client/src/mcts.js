@@ -28,13 +28,13 @@ class MCTSNode {
 
 class Simulator {
     constructor(desired_skills = {}) {
-        this.healing_sim = desired_skills.healing ?? 0;
-        this.close_range_sim = desired_skills.close_range ?? 0;
-        this.ranged_sim = desired_skills.ranged ?? 0;
-        this.adrenaline_sim = desired_skills.adrenaline ?? 0;
-        this.defense_sim = desired_skills.defense ?? 0;
-        this.unique_sim = desired_skills.unique ?? 0;
-        
+        this.healing_sim = desired_skills.Healing ?? 0;
+        this.close_range_sim = desired_skills.Melee ?? 0;
+        this.ranged_sim = desired_skills.Ranged ?? 0;
+        this.adrenaline_sim = desired_skills.Adrenaline ?? 0;
+        this.defense_sim = desired_skills.Defense ?? 0;
+        this.unique_sim = desired_skills.Unique ?? 0;
+
         this.cared_about = [];
         this.caredAboutTraits();
 
@@ -42,33 +42,9 @@ class Simulator {
     }
 
     findDesiredSkills(desired_skills) {
-        let desired = "";
-        let max = -100;
-        if (this.healing_sim > max) {
-            desired = "Healing"; 
-            max = this.healing_sim;
-        }
-        if (this.close_range_sim > max) {
-            desired = "Melee"; 
-            max = this.close_range_sim;
-        }
-        if (this.ranged_sim > max) {
-            desired = "Ranged"; 
-            max = this.ranged_sim;
-        }
-        if (this.adrenaline_sim > max) {
-            desired = "Adrenaline"; 
-            max = this.adrenaline_sim;
-        }
-        if (this.defense_sim > max) {
-            desired = "Defense";
-            max = this.defense_sim;
-        }
-        if (this.unique_sim > max) {
-            desired = "Unique";
-            max = this.unique_sim;
-        }
-        return desired;
+        let max_key = Object.entries(desired_skills)
+            .sort(([, a], [, b]) => b - a)[0][0];
+        return max_key;
     }
 
     nextState(skill_tree, skill_name) {
@@ -90,7 +66,7 @@ class Simulator {
         let undesired_actions = [];
         let desired_actions = [];
         if (skill_tree.points_remaining === 0) {
-            return {desired: [], undesired: []};
+            return { desired: [], undesired: [] };
         }
         for (let [key] of skill_tree.skills.entries()) {
             if (skill_tree.isLegal(key)) {
@@ -326,19 +302,19 @@ class MCTS {
             }
             // If we have no desired skills from the highest trait, choose one at random
             let bad_skill = true;
-            while(bad_skill) {
+            while (bad_skill) {
                 move_index = Math.floor(Math.random() * node.untried_skills.undesired.length);
                 new_action = node.untried_skills.undesired[move_index];
                 let curr_skill_attr = skill_tree.skills.get(new_action).attribute.description;
                 let curr_skill_branch = skill_tree.skills.get(new_action).branch;
                 // 2nd heuristic: if we find a general skill that has a trait we are not looking for, completely ignore
-                if(curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) {
+                if (curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) {
                     move_index = Math.floor(Math.random * node.untried_skills.undesired.length);
                     new_action = node.untried_skills.undesired[move_index];
                     continue;
                 }
                 bad_skill = false;
-                
+
             }
             skill_tree = this.simulator.nextState(skill_tree, new_action);
             new_node = new MCTSNode(node, new_action, this.simulator.getDesiredActions(skill_tree));

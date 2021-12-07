@@ -34,7 +34,7 @@ const convertSkillsToRepresentation = (skills) => {
 }
 
 const SelectSettings = () => {
-    const [value, setValue] = useState({ healing: 16, close_range: 16, ranged: 16, adrenaline: 16, defense: 16, unique: 16 });
+    const [value, setValue] = useState({ Healing: 16, Melee: 16, Ranged: 16, Adrenaline: 16, Defense: 16, Unique: 16 });
     const [startTree] = useState(() => {
         const initialTree = createTree();
         return initialTree;
@@ -55,7 +55,7 @@ const SelectSettings = () => {
         if (isLoading) {
             computeSkills();
         }
-    }, [isLoading, pointCount, setSelectedSkills, startTree, value, value.healing, value.close_range, value.ranged, value.adrenaline, value.defense, value.unique]);
+    }, [isLoading, pointCount, setSelectedSkills, startTree, value, value.Healing, value.Melee, value.Ranged, value.Adrenaline, value.Defense, value.Unique]);
 
 
     const MAX_SKILLS = 96;
@@ -91,12 +91,12 @@ const SelectSettings = () => {
             }
         }
         setValue({
-            healing: sorted.healing,
-            close_range: sorted.close_range,
-            ranged: sorted.ranged,
-            adrenaline: sorted.adrenaline,
-            defense: sorted.defense,
-            unique: sorted.unique
+            Healing: sorted.Healing,
+            Melee: sorted.Melee,
+            Ranged: sorted.Ranged,
+            Adrenaline: sorted.Adrenaline,
+            Defense: sorted.Defense,
+            Unique: sorted.Unique
         });
     };
 

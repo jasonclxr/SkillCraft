@@ -22,12 +22,12 @@ const Home = () => {
         <div style={{ zIndex: 5 }}>
             <Header />
             <Row>
-                <Col className={"settingsForm"} sm={4}>
+                <Col className={"settingsForm bodyFont"} sm={4}>
                     <SelectSettings />
                 </Col>
 
                 <Col sm={7}>
-                    <Tabs defaultActiveKey="combat" className="mb-3" variant={"tabs"}>
+                    <Tabs defaultActiveKey="combat" className="mb-3 " variant={"tabs"}>
                         {selectedSkills && Object.keys(selectedSkills).map((key, index) => {
                             let data = [];
                             if (selectedSkills) {
@@ -41,7 +41,7 @@ const Home = () => {
                                                 <Row xs={5} key={rowIndex} className={"rowItem"}>
                                                     {row.map((item, itemIndex) => {
                                                         return (
-                                                            <Col xs={2} key={itemIndex} className={"gridItem"} disabled={item.points === 0}>
+                                                            <Col xs={2} key={itemIndex} className={"gridItem bodyFont"} disabled={item.points === 0}>
                                                                 <Sprite item={item} />
                                                                 {item.points} / {item.maxPoints}
                                                             </Col>

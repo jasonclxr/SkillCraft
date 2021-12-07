@@ -28,9 +28,12 @@ $nav-tabs-link-active-bg:           $grid-color;
     font-family: "witcher-font";
 }
 
+.bodyFont {
+  font-family: 'Dosis', normal;
+}
+
 .gridItem {
     background-color: $grid-color;
-    font-family: 'Dosis', normal;
     padding: 15px 0px 15px 0px;
     border-radius: 10px;
     margin: 0 5px 10px 5px;

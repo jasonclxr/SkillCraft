@@ -45,19 +45,22 @@ const SelectSettings = () => {
     const { setSelectedSkills } = useContext(AppContext);
 
     useEffect(() => {
-        if (isLoading) {
-            console.log(startTree);
+        async function computeSkills() {
+            await new Promise(r => setTimeout(r, 20));;
             const tree = generateSkills(value, pointCount, startTree);
             const selected_skills = convertSkillsToRepresentation(tree.skills);
             setSelectedSkills(selected_skills);
             setLoading(false);
+        }
+        if (isLoading) {
+            computeSkills();
         }
     }, [isLoading, pointCount, setSelectedSkills, startTree, value, value.healing, value.close_range, value.ranged, value.adrenaline, value.defense, value.unique]);
 
 
     const MAX_SKILLS = 96;
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
     };
@@ -87,7 +90,7 @@ const SelectSettings = () => {
     };
 
     return (
-        <Form style={{ width: '100%' }}>
+        <Form style={{ width: '100%' }} onSubmit={handleSubmit}>
             <Form.Group as={Row} className="mb-3">
                 <Form.Label>
                     <b>Available Points</b>
@@ -120,9 +123,9 @@ const SelectSettings = () => {
             <Form.Group as={Row} className="mb-3">
                 <Col>
                     <div className="d-grid gap-2">
-                        <Button type="submit" onClick={!isLoading ? e => handleSubmit(e) : null} disabled={isLoading}>
+                        <Button type="submit" disabled={isLoading}>
 
-                            {isLoading ? (
+                            {(isLoading) ? (
                                 <Spinner
                                     as="span"
                                     animation="border"
@@ -131,7 +134,7 @@ const SelectSettings = () => {
                                     aria-hidden="true"
                                 />
                             ) : null}
-                            {isLoading ? ' Loading…' : 'Compute'}
+                            {(isLoading) ? ' Loading…' : 'Compute'}
                         </Button>
                     </div>
                 </Col>

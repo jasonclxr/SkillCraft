@@ -33,7 +33,7 @@ class Simulator {
         this.adrenaline_sim = desired_skills.adrenaline ?? 0;
         this.defense_sim = desired_skills.defense ?? 0;
         this.unique_sim = desired_skills.unique ?? 90;
-        
+
         this.cared_about = [];
         this.caredAboutTraits();
     }
@@ -44,12 +44,12 @@ class Simulator {
     }
 
     caredAboutTraits() {
-        if(this.healing_sim > 0) this.cared_about.push("Healing");
-        if(this.close_range_sim > 0) this.cared_about.push("Melee");
-        if(this.ranged_sim > 0) this.cared_about.push("Ranged");
-        if(this.adrenaline_sim > 0) this.cared_about.push("Adrenaline");
-        if(this.defense_sim > 0) this.cared_about.push("Defense");
-        if(this.unique_sim > 0) this.cared_about.push("Unique");
+        if (this.healing_sim > 0) this.cared_about.push("Healing");
+        if (this.close_range_sim > 0) this.cared_about.push("Melee");
+        if (this.ranged_sim > 0) this.cared_about.push("Ranged");
+        if (this.adrenaline_sim > 0) this.cared_about.push("Adrenaline");
+        if (this.defense_sim > 0) this.cared_about.push("Defense");
+        if (this.unique_sim > 0) this.cared_about.push("Unique");
     }
 
     legalActions(skill_tree) {
@@ -254,24 +254,24 @@ class MCTS {
             let new_action = "";
             // Heurisitcs
             let bad_skill = true;
-            while(bad_skill) {
+            while (bad_skill) {
                 move_index = Math.floor(Math.random() * node.untried_skills.length);
                 new_action = node.untried_skills[move_index];
                 let curr_skill_attr = skill_tree.skills.get(new_action).attribute.description;
                 let curr_skill_branch = skill_tree.skills.get(new_action).branch;
                 // 1st heuristic: if we find a general skill that has a trait we are not looking for, completely ignore
-                if(curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) {
+                if (curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) {
                     move_index = Math.floor(Math.random * node.untried_skills.length);
                     new_action = node.untried_skills[move_index];
                     continue;
-                // 2nd heuristic: if we find a skill with a "Unique" trait and it's not desired, as well as being in the
-                // skills trees other than "General Skills", roll a chance where 80% of the time, the skill is completely skipped
-                // } else if(curr_skill_attr === "Unique" && !this.simulator.cared_about.includes(curr_skill_attr)
-                //             && curr_skill_branch !== "general" && Math.floor(Math.random() * 10) < 8) {
-                //     move_index = Math.floor(Math.random * node.untried_skills.length);
-                //     new_action = node.untried_skills[move_index];
-                //     continue;
-                } else { bad_skill = false}
+                    // 2nd heuristic: if we find a skill with a "Unique" trait and it's not desired, as well as being in the
+                    // skills trees other than "General Skills", roll a chance where 80% of the time, the skill is completely skipped
+                    // } else if(curr_skill_attr === "Unique" && !this.simulator.cared_about.includes(curr_skill_attr)
+                    //             && curr_skill_branch !== "general" && Math.floor(Math.random() * 10) < 8) {
+                    //     move_index = Math.floor(Math.random * node.untried_skills.length);
+                    //     new_action = node.untried_skills[move_index];
+                    //     continue;
+                } else { bad_skill = false }
             }
 
             skill_tree = this.simulator.nextState(skill_tree, new_action);
@@ -351,7 +351,7 @@ const Attributes = Object.freeze({
     UNIQUE: Symbol("Unique")
 });
 
-function createTree(num_points = 50) {
+export function createTree(num_points = 50) {
 
     var tree = new SkillTree(new Map(), num_points, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
@@ -512,7 +512,7 @@ function createTree(num_points = 50) {
     return tree;
 }
 
-function generateSkills(desired_skills, num_points, mcts_tree = null) {
+export function generateSkills(desired_skills, num_points, mcts_tree = null) {
     mcts_tree = mcts_tree ?? createTree(num_points);
     mcts_tree.points_remaining = num_points;
     const simulator = new Simulator(desired_skills);
@@ -525,5 +525,5 @@ function generateSkills(desired_skills, num_points, mcts_tree = null) {
     return mcts_tree;
 }
 
-exports.generateSkills = generateSkills;
-exports.createTree = createTree;
+// exports.generateSkills = generateSkills;
+// exports.createTree = createTree;

@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/SkillCraft/static/css/main.8dd72bfe.chunk.css",
-    "main.js": "/SkillCraft/static/js/main.f9ab1362.chunk.js",
-    "main.js.map": "/SkillCraft/static/js/main.f9ab1362.chunk.js.map",
+    "main.js": "/SkillCraft/static/js/main.ee60ed02.chunk.js",
+    "main.js.map": "/SkillCraft/static/js/main.ee60ed02.chunk.js.map",
     "runtime-main.js": "/SkillCraft/static/js/runtime-main.8df90943.js",
     "runtime-main.js.map": "/SkillCraft/static/js/runtime-main.8df90943.js.map",
-    "static/js/2.f62effbe.chunk.js": "/SkillCraft/static/js/2.f62effbe.chunk.js",
-    "static/js/2.f62effbe.chunk.js.map": "/SkillCraft/static/js/2.f62effbe.chunk.js.map",
+    "static/js/2.f853c8a7.chunk.js": "/SkillCraft/static/js/2.f853c8a7.chunk.js",
+    "static/js/2.f853c8a7.chunk.js.map": "/SkillCraft/static/js/2.f853c8a7.chunk.js.map",
     "index.html": "/SkillCraft/index.html",
     "static/css/main.8dd72bfe.chunk.css.map": "/SkillCraft/static/css/main.8dd72bfe.chunk.css.map",
-    "static/js/2.f62effbe.chunk.js.LICENSE.txt": "/SkillCraft/static/js/2.f62effbe.chunk.js.LICENSE.txt",
+    "static/js/2.f853c8a7.chunk.js.LICENSE.txt": "/SkillCraft/static/js/2.f853c8a7.chunk.js.LICENSE.txt",
     "static/media/Skill-Sprite-Sheet.ad77e6d1.png": "/SkillCraft/static/media/Skill-Sprite-Sheet.ad77e6d1.png",
     "static/media/App.scss": "/SkillCraft/static/media/background.4a2ca38c.png"
   },
   "entrypoints": [
     "static/js/runtime-main.8df90943.js",
-    "static/js/2.f62effbe.chunk.js",
+    "static/js/2.f853c8a7.chunk.js",
     "static/css/main.8dd72bfe.chunk.css",
-    "static/js/main.f9ab1362.chunk.js"
+    "static/js/main.ee60ed02.chunk.js"
   ]
 }

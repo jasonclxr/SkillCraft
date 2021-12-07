@@ -1,3 +1,4 @@
+const { find } = require('lodash');
 const copier = require('lodash');
 class Skill {
     constructor(name, attribute, row, maxPoints, branch) {
@@ -32,11 +33,44 @@ class Simulator {
         this.ranged_sim = desired_skills.ranged ?? 0;
         this.adrenaline_sim = desired_skills.adrenaline ?? 0;
         this.defense_sim = desired_skills.defense ?? 0;
-        this.unique_sim = desired_skills.unique ?? 90;
+        this.unique_sim = desired_skills.unique ?? 0;
         
         this.cared_about = [];
         this.caredAboutTraits();
+
+        this.desired = this.findDesiredSkills(desired_skills);
     }
+
+    findDesiredSkills(desired_skills) {
+        let desired = "";
+        let max = -100;
+        if (this.healing_sim > max) {
+            desired = "Healing"; 
+            max = this.healing_sim;
+        }
+        if (this.close_range_sim > max) {
+            desired = "Melee"; 
+            max = this.close_range_sim;
+        }
+        if (this.ranged_sim > max) {
+            desired = "Ranged"; 
+            max = this.ranged_sim;
+        }
+        if (this.adrenaline_sim > max) {
+            desired = "Adrenaline"; 
+            max = this.adrenaline_sim;
+        }
+        if (this.defense_sim > max) {
+            desired = "Defense";
+            max = this.defense_sim;
+        }
+        if (this.unique_sim > max) {
+            desired = "Unique";
+            max = this.unique_sim;
+        }
+        return desired;
+    }
+
     nextState(skill_tree, skill_name) {
         let new_tree = SkillTree.from(skill_tree);
         new_tree.addPoint(skill_name);
@@ -50,6 +84,28 @@ class Simulator {
         if(this.adrenaline_sim > 0) this.cared_about.push("Adrenaline");
         if(this.defense_sim > 0) this.cared_about.push("Defense");
         if(this.unique_sim > 0) this.cared_about.push("Unique");
+    }
+
+    getDesiredActions(skill_tree) {
+        let undesired_actions = [];
+        let desired_actions = [];
+        if (skill_tree.points_remaining === 0) {
+            return {desired: [], undesired: []};
+        }
+        for (let [key] of skill_tree.skills.entries()) {
+            if (skill_tree.isLegal(key)) {
+                if (this.desired === skill_tree.skills.get(key).attribute.description) {
+                    desired_actions.push(key);
+                } else {
+                    undesired_actions.push(key);
+                }
+            }
+        }
+        let total_actions = {
+            desired: desired_actions,
+            undesired: undesired_actions
+        };
+        return total_actions;
     }
 
     legalActions(skill_tree) {
@@ -227,7 +283,7 @@ class MCTS {
     traverse_nodes(node) {
         let current_node = node;
         let max_uct_node = current_node;
-        while (current_node.untried_skills.length > 0 && current_node.child_nodes.size > 0) {
+        while ((current_node.untried_skills.desired.length > 0 || current_node.untried_skills.undesired.length > 0) && current_node.child_nodes.size > 0) {
             let max_uct = -Infinity;
             for (let child_node of current_node.child_nodes.values()) {
                 let uct = -Infinity;
@@ -249,33 +305,38 @@ class MCTS {
     // Adds a new leaf to the tree by creating a new child node for the given node.
     expand_leaf(node, skill_tree) {
         let new_node = node;
-        if (node.untried_skills.length > 0) {
+        if (node.untried_skills.undesired.length > 0 || node.untried_skills.desired.length > 0) {
             let move_index = 0;
             let new_action = "";
             // Heurisitcs
+            // 1st Heuristic: Checks to see if we have any available skills that is the highest desired trait and
+            // returns/pops one off the list
+            if (node.untried_skills.desired.length > 0) {
+                move_index = Math.floor(Math.random() * node.untried_skills.desired.length);
+                new_action = node.untried_skills.desired[move_index];
+                skill_tree = this.simulator.nextState(skill_tree, new_action);
+                new_node = new MCTSNode(node, new_action, this.simulator.getDesiredActions(skill_tree));
+                node.child_nodes.set(new_action, new_node);
+                return new_node;
+            }
+            // If we have no desired skills from the highest trait, choose one at random
             let bad_skill = true;
             while(bad_skill) {
-                move_index = Math.floor(Math.random() * node.untried_skills.length);
-                new_action = node.untried_skills[move_index];
+                move_index = Math.floor(Math.random() * node.untried_skills.undesired.length);
+                new_action = node.untried_skills.undesired[move_index];
                 let curr_skill_attr = skill_tree.skills.get(new_action).attribute.description;
                 let curr_skill_branch = skill_tree.skills.get(new_action).branch;
-                // 1st heuristic: if we find a general skill that has a trait we are not looking for, completely ignore
+                // 2nd heuristic: if we find a general skill that has a trait we are not looking for, completely ignore
                 if(curr_skill_branch === "general" && !this.simulator.cared_about.includes(curr_skill_attr)) {
-                    move_index = Math.floor(Math.random * node.untried_skills.length);
-                    new_action = node.untried_skills[move_index];
+                    move_index = Math.floor(Math.random * node.untried_skills.undesired.length);
+                    new_action = node.untried_skills.undesired[move_index];
                     continue;
-                // 2nd heuristic: if we find a skill with a "Unique" trait and it's not desired, as well as being in the
-                // skills trees other than "General Skills", roll a chance where 80% of the time, the skill is completely skipped
-                // } else if(curr_skill_attr === "Unique" && !this.simulator.cared_about.includes(curr_skill_attr)
-                //             && curr_skill_branch !== "general" && Math.floor(Math.random() * 10) < 8) {
-                //     move_index = Math.floor(Math.random * node.untried_skills.length);
-                //     new_action = node.untried_skills[move_index];
-                //     continue;
-                } else { bad_skill = false}
+                }
+                bad_skill = false;
+                
             }
-
             skill_tree = this.simulator.nextState(skill_tree, new_action);
-            new_node = new MCTSNode(node, new_action, this.simulator.legalActions(skill_tree));
+            new_node = new MCTSNode(node, new_action, this.simulator.getDesiredActions(skill_tree));
             node.child_nodes.set(new_action, new_node);
         }
         return new_node;
@@ -306,10 +367,10 @@ class MCTS {
 
     // Performs MCTS by sampling games and returns the action
     think(skill_tree) {
-        let root_node = new MCTSNode(null, null, this.simulator.legalActions(skill_tree));
+        let root_node = new MCTSNode(null, null, this.simulator.getDesiredActions(skill_tree));
         let sampled_tree = skill_tree;
         let node = root_node;
-        for (let step = 0; step < 500; step++) {
+        for (let step = 0; step < 50; step++) {
             sampled_tree = skill_tree;
             node = root_node;
             node = this.traverse_nodes(node);

@@ -78,12 +78,12 @@ class Simulator {
     }
 
     caredAboutTraits() {
-        if(this.healing_sim > 0) this.cared_about.push("Healing");
-        if(this.close_range_sim > 0) this.cared_about.push("Melee");
-        if(this.ranged_sim > 0) this.cared_about.push("Ranged");
-        if(this.adrenaline_sim > 0) this.cared_about.push("Adrenaline");
-        if(this.defense_sim > 0) this.cared_about.push("Defense");
-        if(this.unique_sim > 0) this.cared_about.push("Unique");
+        if (this.healing_sim > 0) this.cared_about.push("Healing");
+        if (this.close_range_sim > 0) this.cared_about.push("Melee");
+        if (this.ranged_sim > 0) this.cared_about.push("Ranged");
+        if (this.adrenaline_sim > 0) this.cared_about.push("Adrenaline");
+        if (this.defense_sim > 0) this.cared_about.push("Defense");
+        if (this.unique_sim > 0) this.cared_about.push("Unique");
     }
 
     getDesiredActions(skill_tree) {
@@ -279,6 +279,16 @@ class MCTS {
         this.explore_factor = explore_factor;
         this.simulator = simulator;
     }
+
+    UCT(child_node) {
+        let uct = -Infinity;
+        if (child_node.parent === null) {
+            uct = 1 - child_node.score / child_node.visits;
+        } else {
+            uct = (1 - (child_node.score / child_node.visits)) + this.explore_factor * 2 * Math.sqrt(Math.log(child_node.parent.visits) / child_node.visits);
+        }
+        return uct;
+    }
     // Traverse graph using UCT function until leaf node is reached
     traverse_nodes(node) {
         let current_node = node;
@@ -286,12 +296,7 @@ class MCTS {
         while ((current_node.untried_skills.desired.length > 0 || current_node.untried_skills.undesired.length > 0) && current_node.child_nodes.size > 0) {
             let max_uct = -Infinity;
             for (let child_node of current_node.child_nodes.values()) {
-                let uct = -Infinity;
-                if (node.parent === null) {
-                    uct = 1 - child_node.score / child_node.visits;
-                } else {
-                    uct = (1 - (child_node.score / child_node.visits)) + this.explore_factor * 2 * Math.sqrt(Math.log(child_node.parent.visits) / child_node.visits);
-                }
+                let uct = this.UCT(child_node);
                 if (uct > max_uct) {
                     max_uct = uct;
                     max_uct_node = child_node;
@@ -412,7 +417,7 @@ const Attributes = Object.freeze({
     UNIQUE: Symbol("Unique")
 });
 
-function createTree(num_points = 50) {
+export function createTree(num_points = 50) {
 
     var tree = new SkillTree(new Map(), num_points, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
@@ -573,7 +578,7 @@ function createTree(num_points = 50) {
     return tree;
 }
 
-function generateSkills(desired_skills, num_points, mcts_tree = null) {
+export function generateSkills(desired_skills, num_points, mcts_tree = null) {
     mcts_tree = mcts_tree ?? createTree(num_points);
     mcts_tree.points_remaining = num_points;
     const simulator = new Simulator(desired_skills);
@@ -586,5 +591,5 @@ function generateSkills(desired_skills, num_points, mcts_tree = null) {
     return mcts_tree;
 }
 
-exports.generateSkills = generateSkills;
-exports.createTree = createTree;
+// exports.generateSkills = generateSkills;
+// exports.createTree = createTree;

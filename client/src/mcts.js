@@ -351,7 +351,7 @@ class MCTS {
         let root_node = new MCTSNode(null, null, this.simulator.getDesiredActions(skill_tree));
         let sampled_tree = skill_tree;
         let node = root_node;
-        for (let step = 0; step < 50; step++) {
+        for (let step = 0; step < 350; step++) {
             sampled_tree = skill_tree;
             node = root_node;
             node = this.traverse_nodes(node);

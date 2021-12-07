@@ -223,6 +223,16 @@ class MCTS {
         this.explore_factor = explore_factor;
         this.simulator = simulator;
     }
+
+    UCT(child_node) {
+        let uct = -Infinity;
+        if (child_node.parent === null) {
+            uct = 1 - child_node.score / child_node.visits;
+        } else {
+            uct = (1 - (child_node.score / child_node.visits)) + this.explore_factor * 2 * Math.sqrt(Math.log(child_node.parent.visits) / child_node.visits);
+        }
+        return uct;
+    }
     // Traverse graph using UCT function until leaf node is reached
     traverse_nodes(node) {
         let current_node = node;
@@ -230,12 +240,7 @@ class MCTS {
         while (current_node.untried_skills.length > 0 && current_node.child_nodes.size > 0) {
             let max_uct = -Infinity;
             for (let child_node of current_node.child_nodes.values()) {
-                let uct = -Infinity;
-                if (node.parent === null) {
-                    uct = 1 - child_node.score / child_node.visits;
-                } else {
-                    uct = (1 - (child_node.score / child_node.visits)) + this.explore_factor * 2 * Math.sqrt(Math.log(child_node.parent.visits) / child_node.visits);
-                }
+                let uct = this.UCT(child_node);
                 if (uct > max_uct) {
                     max_uct = uct;
                     max_uct_node = child_node;

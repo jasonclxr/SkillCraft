@@ -65,28 +65,39 @@ const SelectSettings = () => {
         setLoading(true);
     };
 
-    const calculateMaxID = (current_id) => {
-        const maxID = Object.entries(value).reduce((a, b) => {
-            if (a[0] === current_id) return b;
-            if (b[0] === current_id) return a;
-            return a[1] > b[1] ? a : b
-        })[0];
-        return maxID;
-    }
+    const getSortedValues = () => Object.entries(value)
+        .sort(([, a], [, b]) => b - a)
+        .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
 
     const calculateSliders = (e, key) => {
-        let nextMax = calculateMaxID(key);
         let newValue = parseInt(e.target.value);
         let difference = value[key] - newValue;
-        let newNext = value[nextMax] + difference;
-        if (newNext < 0) {
-            newNext = 0;
-            newValue += (newNext);
+        let sorted = getSortedValues();
+        let diff_remaining = difference;
+
+        sorted[key] = newValue;
+        for (let k in sorted) {
+            if (k === key) {
+                continue;
+            }
+            let val = sorted[k];
+            if (val + diff_remaining < 0) {
+                sorted[k] = 0;
+                diff_remaining = val + diff_remaining;
+            } else {
+                sorted[k] = val + diff_remaining;
+                diff_remaining = 0;
+                break;
+            }
         }
-        if (newNext > MAX_SKILLS) {
-            newNext = MAX_SKILLS;
-        }
-        setValue({ ...value, [key]: newValue, [nextMax]: newNext });
+        setValue({
+            healing: sorted.healing,
+            close_range: sorted.close_range,
+            ranged: sorted.ranged,
+            adrenaline: sorted.adrenaline,
+            defense: sorted.defense,
+            unique: sorted.unique
+        });
     };
 
     return (

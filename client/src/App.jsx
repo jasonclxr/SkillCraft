@@ -9,7 +9,7 @@ function App() {
     <AppContextProvider>
       <div filter='blur(5px)' className={"customBackground"} />
       <Container >
-        <Router>
+        <Router basename={window.location.pathname || ''}>
           <Routes>
             <Route exact path="/" element={<Home />} />
           </Routes>

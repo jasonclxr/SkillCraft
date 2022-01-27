@@ -1,4 +1,3 @@
-const { find } = require('lodash');
 const copier = require('lodash');
 class Skill {
     constructor(name, attribute, row, maxPoints, branch) {

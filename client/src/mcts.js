@@ -420,7 +420,7 @@ export function createTree(num_points = 50) {
 
     let whirl = new Skill("Whirl", Attributes.CLOSE_RANGE, 2, 5, "combat");
     tree.skills.set("Whirl", whirl);
-    let rend = new Skill("Crushing Blows", Attributes.CLOSE_RANGE, 2, 5, "combat");
+    let rend = new Skill("Rend", Attributes.CLOSE_RANGE, 2, 5, "combat");
     tree.skills.set("Rend", rend);
     let counterAttack = new Skill("Counter Attack", Attributes.DEFENSE, 2, 3, "combat");
     tree.skills.set("Counter Attack", counterAttack);
